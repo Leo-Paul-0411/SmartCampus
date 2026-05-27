@@ -1,0 +1,17 @@
+# Fichiers système Windows et Mac
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Dépendances Node / React (très lourd, à ne jamais envoyer sur Git)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environnement et jetons de sécurité (ex: JWT)
+.env
+.env.local
+
+# Fichiers de log PHP
+*.log
