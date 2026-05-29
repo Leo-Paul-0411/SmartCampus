@@ -38,3 +38,15 @@ des inscriptions, des notes et des espaces utilisateurs.
 
 Chaque membre travaille sur sa propre branche et réalise des petits commits
 réguliers avec des messages clairs.
+
+## Organisation du travail
+
+Le projet est développé avec une organisation par branches afin de garantir une répartition claire du travail.
+
+Documents utiles :
+
+* docs/repartition_travail.md
+* docs/journal_ia.md
+* docs/checklist_pr.md
+
+Chaque membre travaille sur sa branche, réalise des petits commits, teste localement avec WAMP, puis propose ses modifications via Pull Request.
