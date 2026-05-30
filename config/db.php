@@ -1,15 +1,16 @@
 <?php
-// Connexion simple a la base de donnees MySQL avec mysqli.
+
 
 $serveur = 'localhost';
 $utilisateur = 'root';
-$mot_de_passe = '';
+$mot_de_passe = 'root'; 
 $base = 'smartcampus';
 
-$connexion = new mysqli($serveur, $utilisateur, $mot_de_passe, $base);
 
-if ($connexion->connect_error) {
-    die('Erreur de connexion a la base de donnees.');
+$conn = new mysqli($serveur, $utilisateur, $mot_de_passe, $base);
+
+if ($conn->connect_error) {
+    die('Erreur de connexion a la base de donnees : ' . $conn->connect_error);
 }
 
-$connexion->set_charset('utf8mb4');
+$conn->set_charset('utf8mb4');
