@@ -63,6 +63,49 @@ if (isset($_GET['desinscrire'])) {
     }
 }
 
+if (isset($_POST['valider_demande']) || isset($_POST['refuser_demande'])) {
+    $id_inscription = intval($_POST['id_inscription'] ?? 0);
+    $inscription = infos_inscription($conn, $id_inscription);
+
+    if (!$inscription || $inscription['statut'] !== 'en_attente') {
+        $message = "Erreur : demande introuvable ou deja traitee.";
+        $type_message = "erreur";
+    } elseif (isset($_POST['refuser_demande'])) {
+        if (modifier_statut_inscription($conn, $id_inscription, 'desinscrit')) {
+            creer_notification($conn, $inscription['id_user'], "Votre demande d'inscription au cours " . $inscription['titre'] . " a ete refusee.", "inscription");
+            $message = "Demande refusee.";
+            $type_message = "succes";
+        } else {
+            $message = "Erreur lors du refus de la demande.";
+            $type_message = "erreur";
+        }
+    } elseif (cours_est_complet($conn, $inscription['id_cours'])) {
+        $raison = "cours complet";
+        modifier_statut_inscription($conn, $id_inscription, 'desinscrit');
+        creer_notification($conn, $inscription['id_user'], "Votre demande d'inscription au cours " . $inscription['titre'] . " a ete refusee : " . $raison . ".", "inscription");
+        $message = "Validation refusee : ce cours est complet.";
+        $type_message = "erreur";
+    } elseif (conflit_horaire($conn, $inscription['id_etudiant'], $inscription['id_cours'])) {
+        $raison = "conflit horaire";
+        modifier_statut_inscription($conn, $id_inscription, 'desinscrit');
+        creer_notification($conn, $inscription['id_user'], "Votre demande d'inscription au cours " . $inscription['titre'] . " a ete refusee : " . $raison . ".", "inscription");
+        $message = "Validation refusee : conflit horaire.";
+        $type_message = "erreur";
+    } elseif (etudiant_deja_inscrit($conn, $inscription['id_etudiant'], $inscription['id_cours'])) {
+        modifier_statut_inscription($conn, $id_inscription, 'desinscrit');
+        creer_notification($conn, $inscription['id_user'], "Votre demande d'inscription au cours " . $inscription['titre'] . " a ete refusee : deja inscrit.", "inscription");
+        $message = "Validation refusee : l'etudiant est deja inscrit a ce cours.";
+        $type_message = "erreur";
+    } elseif (modifier_statut_inscription($conn, $id_inscription, 'inscrit')) {
+        creer_notification($conn, $inscription['id_user'], "Votre demande d'inscription au cours " . $inscription['titre'] . " a ete acceptee.", "inscription");
+        $message = "Demande validee.";
+        $type_message = "succes";
+    } else {
+        $message = "Erreur lors de la validation de la demande.";
+        $type_message = "erreur";
+    }
+}
+
 if (isset($_POST['changer_statut'])) {
     $id_inscription = intval($_POST['id_inscription'] ?? 0);
     $nouveau_statut = $_POST['statut'] ?? '';
@@ -227,6 +270,19 @@ if (!empty($params)) {
     $result_inscriptions = mysqli_query($conn, $sql_inscriptions);
 }
 
+$result_demandes = mysqli_query(
+    $conn,
+    "SELECT i.id_inscription, i.date_inscription,
+            u.nom, u.prenom, e.numero_etudiant,
+            c.code_cours, c.titre
+     FROM inscription i
+     INNER JOIN etudiant e ON i.id_etudiant = e.id_etudiant
+     INNER JOIN utilisateur u ON e.id_user = u.id_user
+     INNER JOIN cours c ON i.id_cours = c.id_cours
+     WHERE i.statut = 'en_attente'
+     ORDER BY i.date_inscription ASC"
+);
+
 include '../includes/header.php';
 ?>
 
@@ -271,6 +327,41 @@ include '../includes/header.php';
 
         <button type="submit" name="inscrire_etudiant">Inscrire</button>
     </form>
+</section>
+
+<section>
+    <h3>Demandes en attente</h3>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>etudiant</th>
+                <th>cours</th>
+                <th>date_demande</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($result_demandes && mysqli_num_rows($result_demandes) > 0) { ?>
+                <?php while ($demande = mysqli_fetch_assoc($result_demandes)) { ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($demande['prenom'] . ' ' . $demande['nom'] . ' - ' . $demande['numero_etudiant']); ?></td>
+                        <td><?php echo htmlspecialchars($demande['code_cours'] . ' - ' . $demande['titre']); ?></td>
+                        <td><?php echo htmlspecialchars($demande['date_inscription']); ?></td>
+                        <td>
+                            <form method="post" action="inscriptions.php">
+                                <input type="hidden" name="id_inscription" value="<?php echo htmlspecialchars($demande['id_inscription']); ?>">
+                                <button type="submit" name="valider_demande">Valider</button>
+                                <button type="submit" name="refuser_demande" class="danger js-confirm-delete" data-confirm="Refuser cette demande ?">Refuser</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php } ?>
+            <?php } else { ?>
+                <tr><td colspan="4">Aucune demande en attente.</td></tr>
+            <?php } ?>
+        </tbody>
+    </table>
 </section>
 
 <section>
