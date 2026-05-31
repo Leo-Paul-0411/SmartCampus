@@ -2,6 +2,6 @@
 
 <h2>Gestion des enseignants</h2>
 
-<!-- TODO : CRUD enseignants. -->
+<!-- TODO : afficher, ajouter, modifier, supprimer les enseignants. -->
 
 <?php include '../includes/footer.php'; ?>
