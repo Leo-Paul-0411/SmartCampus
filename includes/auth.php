@@ -24,7 +24,17 @@ function verifier_role($role)
 {
     verifier_connexion();
 
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== $role) {
+    $role_session = $_SESSION['role'] ?? '';
+
+    if ($role_session === 'administrateur') {
+        $role_session = 'admin';
+    }
+
+    if ($role === 'administrateur') {
+        $role = 'admin';
+    }
+
+    if ($role_session !== $role) {
         rediriger_selon_role($_SESSION['role'] ?? '');
     }
 }
@@ -32,6 +42,10 @@ function verifier_role($role)
 // Redirige l'utilisateur vers le dashboard correspondant a son role.
 function rediriger_selon_role($role)
 {
+    if ($role === 'administrateur') {
+        $role = 'admin';
+    }
+
     if ($role === 'admin') {
         header('Location: ../admin/dashboard.php');
         exit;

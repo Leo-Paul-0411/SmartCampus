@@ -39,6 +39,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['prenom'] = $utilisateur['prenom'];
                 $_SESSION['email'] = $utilisateur['email'];
                 $_SESSION['role'] = $role;
+                unset($_SESSION['id_enseignant'], $_SESSION['id_etudiant']);
+
+                if ($role === 'enseignant') {
+                    $sql_enseignant = "SELECT id_enseignant
+                                       FROM enseignant
+                                       WHERE id_user = ?";
+                    $requete_enseignant = mysqli_prepare($conn, $sql_enseignant);
+
+                    if ($requete_enseignant) {
+                        mysqli_stmt_bind_param($requete_enseignant, "i", $utilisateur['id_user']);
+                        mysqli_stmt_execute($requete_enseignant);
+                        $resultat_enseignant = mysqli_stmt_get_result($requete_enseignant);
+                        $enseignant = mysqli_fetch_assoc($resultat_enseignant);
+                        mysqli_stmt_close($requete_enseignant);
+
+                        if ($enseignant) {
+                            $_SESSION['id_enseignant'] = $enseignant['id_enseignant'];
+                        }
+                    }
+                }
+
+                if ($role === 'etudiant') {
+                    $sql_etudiant = "SELECT id_etudiant
+                                     FROM etudiant
+                                     WHERE id_user = ?";
+                    $requete_etudiant = mysqli_prepare($conn, $sql_etudiant);
+
+                    if ($requete_etudiant) {
+                        mysqli_stmt_bind_param($requete_etudiant, "i", $utilisateur['id_user']);
+                        mysqli_stmt_execute($requete_etudiant);
+                        $resultat_etudiant = mysqli_stmt_get_result($requete_etudiant);
+                        $etudiant = mysqli_fetch_assoc($resultat_etudiant);
+                        mysqli_stmt_close($requete_etudiant);
+
+                        if ($etudiant) {
+                            $_SESSION['id_etudiant'] = $etudiant['id_etudiant'];
+                        }
+                    }
+                }
 
                 rediriger_selon_role($role);
             } else {
