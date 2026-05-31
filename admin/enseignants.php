@@ -196,6 +196,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Gestion des enseignants</h1>
+    <p class="page-subtitle">Ajouter, modifier et verifier les cours associes a chaque enseignant.</p>
 
     <?php if ($message): ?><p class="success"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
     <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
@@ -247,7 +248,11 @@ include __DIR__ . '/../includes/header.php';
                         <td><?php echo htmlspecialchars($enseignant['bureau']); ?></td>
                         <td><?php echo htmlspecialchars($enseignant['telephone']); ?></td>
                         <td><?php echo htmlspecialchars($enseignant['nb_cours'] . ' cours : ' . ($enseignant['cours_associes'] ?? '-')); ?></td>
-                        <td><?php echo $enseignant['actif'] ? 'Actif' : 'Desactive'; ?></td>
+                        <td>
+                            <span class="badge <?php echo $enseignant['actif'] ? 'badge-success' : 'badge-muted'; ?>">
+                                <?php echo $enseignant['actif'] ? 'Actif' : 'Desactive'; ?>
+                            </span>
+                        </td>
                         <td>
                             <a class="button secondary" href="enseignants.php?modifier=<?php echo $enseignant['id_enseignant']; ?>">Modifier</a>
                             <a class="button danger js-confirm-delete" href="enseignants.php?supprimer=<?php echo $enseignant['id_enseignant']; ?>" data-confirm="Supprimer ou desactiver cet enseignant ?">Supprimer</a>

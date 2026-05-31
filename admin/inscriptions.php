@@ -286,7 +286,9 @@ $result_demandes = mysqli_query(
 include '../includes/header.php';
 ?>
 
+<section class="container">
 <h2>Gestion des inscriptions</h2>
+<p class="page-subtitle">Traiter les demandes, inscrire directement un etudiant et suivre les statuts.</p>
 
 <?php if ($message !== "") { ?>
     <p class="<?php echo $type_message === 'succes' ? 'success' : 'error'; ?>"><?php echo htmlspecialchars($message); ?></p>
@@ -331,8 +333,9 @@ include '../includes/header.php';
 
 <section>
     <h3>Demandes en attente</h3>
+    <p class="alert alert-info">La validation controle automatiquement la capacite, le conflit horaire et la double inscription.</p>
 
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>etudiant</th>
@@ -389,7 +392,7 @@ include '../includes/header.php';
         <a class="button secondary" href="inscriptions.php">Reinitialiser</a>
     </form>
 
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>etudiant</th>
@@ -407,6 +410,15 @@ include '../includes/header.php';
                         <td><?php echo htmlspecialchars($inscription['code_cours'] . ' - ' . $inscription['titre']); ?></td>
                         <td><?php echo htmlspecialchars($inscription['date_inscription']); ?></td>
                         <td>
+                            <span class="badge <?php
+                                if ($inscription['statut'] === 'inscrit') {
+                                    echo 'badge-success';
+                                } elseif ($inscription['statut'] === 'en_attente') {
+                                    echo 'badge-warning';
+                                } else {
+                                    echo 'badge-muted';
+                                }
+                            ?>"><?php echo htmlspecialchars($inscription['statut']); ?></span>
                             <form method="post" action="inscriptions.php">
                                 <input type="hidden" name="id_inscription" value="<?php echo htmlspecialchars($inscription['id_inscription']); ?>">
                                 <select name="statut">
@@ -433,4 +445,5 @@ include '../includes/header.php';
     </table>
 </section>
 
+</section>
 <?php include '../includes/footer.php'; ?>

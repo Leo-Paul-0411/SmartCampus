@@ -98,6 +98,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Mes cours et demandes</h1>
+    <p class="page-subtitle">Les demandes passent par une validation administrateur avant inscription definitive.</p>
 
     <?php if ($message): ?><p class="success"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
     <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
@@ -117,73 +118,108 @@ include __DIR__ . '/../includes/header.php';
     mysqli_stmt_bind_param($stmt, "i", $id_etudiant);
     mysqli_stmt_execute($stmt);
     $resultat = mysqli_stmt_get_result($stmt);
+
+    $groupes_cours = [
+        'inscrit' => [],
+        'en_attente' => [],
+        'disponible' => [],
+        'desinscrit' => []
+    ];
+
+    if ($resultat) {
+        while ($cours = mysqli_fetch_assoc($resultat)) {
+            $statut = $cours['statut'] ?: 'disponible';
+            if (!isset($groupes_cours[$statut])) {
+                $statut = 'disponible';
+            }
+            $groupes_cours[$statut][] = $cours;
+        }
+    }
     ?>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Cours</th>
-                <th>Jour</th>
-                <th>Horaire</th>
-                <th>Salle</th>
-                <th>Enseignant</th>
-                <th>Capacite</th>
-                <th>Statut</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ($resultat && mysqli_num_rows($resultat) > 0): ?>
-                <?php while ($cours = mysqli_fetch_assoc($resultat)): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($cours['code_cours']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['titre']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['jour']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['heure_debut'] . ' - ' . $cours['heure_fin']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['salle']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['enseignant_prenom'] . ' ' . $cours['enseignant_nom']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['nb_inscrits'] . ' / ' . $cours['capacite_max']); ?></td>
-                        <td>
+    <?php
+    $sections = [
+        'inscrit' => 'Cours valides',
+        'en_attente' => 'Demandes en attente',
+        'disponible' => 'Cours disponibles',
+        'desinscrit' => 'Cours retires ou refuses'
+    ];
+    ?>
+
+    <?php foreach ($sections as $statut_section => $titre_section): ?>
+        <section>
+            <h2 class="section-title"><?php echo htmlspecialchars($titre_section); ?></h2>
+
+            <?php if (!empty($groupes_cours[$statut_section])): ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Cours</th>
+                            <th>Jour</th>
+                            <th>Horaire</th>
+                            <th>Salle</th>
+                            <th>Enseignant</th>
+                            <th>Capacite</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($groupes_cours[$statut_section] as $cours): ?>
                             <?php
-                            if ($cours['statut'] === 'inscrit') {
-                                echo 'Inscrit';
-                            } elseif ($cours['statut'] === 'en_attente') {
-                                echo 'Demande en attente';
-                            } elseif ($cours['statut'] === 'desinscrit') {
-                                echo 'Desinscrit';
-                            } else {
-                                echo 'Disponible';
+                            $statut = $cours['statut'] ?: 'disponible';
+                            $badge = 'badge-info';
+                            $libelle = 'Disponible';
+                            if ($statut === 'inscrit') {
+                                $badge = 'badge-success';
+                                $libelle = 'Inscrit';
+                            } elseif ($statut === 'en_attente') {
+                                $badge = 'badge-warning';
+                                $libelle = 'En attente';
+                            } elseif ($statut === 'desinscrit') {
+                                $badge = 'badge-muted';
+                                $libelle = 'Retire';
                             }
                             ?>
-                        </td>
-                        <td>
-                            <?php if ($cours['statut'] === 'inscrit'): ?>
-                                <form method="post" action="cours.php">
-                                    <input type="hidden" name="id_inscription" value="<?php echo htmlspecialchars($cours['id_inscription']); ?>">
-                                    <button type="submit" name="desinscrire" class="danger js-confirm-delete" data-confirm="Se desinscrire de ce cours ?">Se desinscrire</button>
-                                </form>
-                            <?php elseif ($cours['statut'] === 'en_attente'): ?>
-                                Demande en attente
-                            <?php elseif ($cours['statut'] === 'desinscrit'): ?>
-                                <form method="post" action="cours.php">
-                                    <input type="hidden" name="id_cours" value="<?php echo htmlspecialchars($cours['id_cours']); ?>">
-                                    <button type="submit" name="demander_inscription">Redemander l'inscription</button>
-                                </form>
-                            <?php else: ?>
-                                <form method="post" action="cours.php">
-                                    <input type="hidden" name="id_cours" value="<?php echo htmlspecialchars($cours['id_cours']); ?>">
-                                    <button type="submit" name="demander_inscription">Demander l'inscription</button>
-                                </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($cours['code_cours']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['titre']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['jour']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['heure_debut'] . ' - ' . $cours['heure_fin']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['salle']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['enseignant_prenom'] . ' ' . $cours['enseignant_nom']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['nb_inscrits'] . ' / ' . $cours['capacite_max']); ?></td>
+                                <td><span class="badge <?php echo $badge; ?>"><?php echo htmlspecialchars($libelle); ?></span></td>
+                                <td>
+                                    <?php if ($statut === 'inscrit'): ?>
+                                        <form method="post" action="cours.php">
+                                            <input type="hidden" name="id_inscription" value="<?php echo htmlspecialchars($cours['id_inscription']); ?>">
+                                            <button type="submit" name="desinscrire" class="danger js-confirm-delete" data-confirm="Se desinscrire de ce cours ?">Se desinscrire</button>
+                                        </form>
+                                    <?php elseif ($statut === 'en_attente'): ?>
+                                        <span class="muted">En attente de validation admin</span>
+                                    <?php elseif ($statut === 'desinscrit'): ?>
+                                        <form method="post" action="cours.php">
+                                            <input type="hidden" name="id_cours" value="<?php echo htmlspecialchars($cours['id_cours']); ?>">
+                                            <button type="submit" name="demander_inscription">Redemander l'inscription</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <form method="post" action="cours.php">
+                                            <input type="hidden" name="id_cours" value="<?php echo htmlspecialchars($cours['id_cours']); ?>">
+                                            <button type="submit" name="demander_inscription">Demander l'inscription</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             <?php else: ?>
-                <tr><td colspan="9">Aucun cours trouve.</td></tr>
+                <p class="muted">Aucun cours dans cette categorie.</p>
             <?php endif; ?>
-        </tbody>
-    </table>
+        </section>
+    <?php endforeach; ?>
 </section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -6,7 +6,6 @@ if (function_exists('verifier_role')) {
     verifier_role('etudiant');
 }
 
-// TODO : remplacer par l'id etudiant venant de la session quand l'authentification sera finalisee.
 $id_etudiant = $_SESSION['id_etudiant'] ?? 0;
 
 include __DIR__ . '/../includes/header.php';
@@ -14,6 +13,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Emploi du temps</h1>
+    <p class="page-subtitle">Seuls les cours avec le statut inscrit sont affiches.</p>
 
     <?php
     $sql = "SELECT cours.jour, cours.heure_debut, cours.heure_fin, cours.titre, cours.salle,
@@ -29,38 +29,46 @@ include __DIR__ . '/../includes/header.php';
     mysqli_stmt_bind_param($stmt, "i", $id_etudiant);
     mysqli_stmt_execute($stmt);
     $resultat = mysqli_stmt_get_result($stmt);
+
+    $cours_par_jour = [];
+    if ($resultat) {
+        while ($cours = mysqli_fetch_assoc($resultat)) {
+            $cours_par_jour[$cours['jour']][] = $cours;
+        }
+    }
     ?>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Jour</th>
-                <th>Debut</th>
-                <th>Fin</th>
-                <th>Cours</th>
-                <th>Salle</th>
-                <th>Enseignant</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ($resultat && mysqli_num_rows($resultat) > 0): ?>
-                <?php while ($cours = mysqli_fetch_assoc($resultat)): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($cours['jour']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['heure_debut']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['heure_fin']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['titre']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['salle']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['prenom'] . ' ' . $cours['nom']); ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="6">Aucun cours dans l'emploi du temps.</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+    <?php if (!empty($cours_par_jour)): ?>
+        <?php foreach ($cours_par_jour as $jour => $liste_cours): ?>
+            <section class="day-block">
+                <h2><?php echo htmlspecialchars($jour); ?></h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Debut</th>
+                            <th>Fin</th>
+                            <th>Cours</th>
+                            <th>Salle</th>
+                            <th>Enseignant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($liste_cours as $cours): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($cours['heure_debut']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['heure_fin']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['titre']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['salle']); ?></td>
+                                <td><?php echo htmlspecialchars($cours['prenom'] . ' ' . $cours['nom']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </section>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p class="alert alert-info">Aucun cours dans l'emploi du temps.</p>
+    <?php endif; ?>
 </section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

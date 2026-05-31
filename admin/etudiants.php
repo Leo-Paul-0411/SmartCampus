@@ -196,6 +196,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Gestion des etudiants</h1>
+    <p class="page-subtitle">Ajouter, modifier et suivre les comptes etudiants.</p>
 
     <?php if ($message): ?><p class="success"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
     <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
@@ -248,7 +249,11 @@ include __DIR__ . '/../includes/header.php';
                         <td><?php echo htmlspecialchars($etudiant['niveau']); ?></td>
                         <td><?php echo htmlspecialchars($etudiant['groupe_classe']); ?></td>
                         <td><?php echo htmlspecialchars($etudiant['telephone']); ?></td>
-                        <td><?php echo $etudiant['actif'] ? 'Actif' : 'Desactive'; ?></td>
+                        <td>
+                            <span class="badge <?php echo $etudiant['actif'] ? 'badge-success' : 'badge-muted'; ?>">
+                                <?php echo $etudiant['actif'] ? 'Actif' : 'Desactive'; ?>
+                            </span>
+                        </td>
                         <td>
                             <a class="button secondary" href="etudiants.php?modifier=<?php echo $etudiant['id_etudiant']; ?>">Modifier</a>
                             <a class="button danger js-confirm-delete" href="etudiants.php?supprimer=<?php echo $etudiant['id_etudiant']; ?>" data-confirm="Supprimer ou desactiver cet etudiant ?">Supprimer</a>

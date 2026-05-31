@@ -94,10 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include '../includes/header.php';
 ?>
 
+<section class="container">
 <h2>Connexion</h2>
+<p class="page-subtitle">Connectez-vous avec un compte admin, enseignant ou etudiant pour afficher la navigation adaptee.</p>
 
 <?php if ($message !== "") { ?>
-    <p><?php echo htmlspecialchars($message); ?></p>
+    <p class="error"><?php echo htmlspecialchars($message); ?></p>
 <?php } ?>
 
 <form method="post" action="login.php">
@@ -111,7 +113,8 @@ include '../includes/header.php';
         <input type="password" id="mot_de_passe" name="mot_de_passe" required>
     </p>
 
-    <button type="submit">Se connecter</button>
+<button type="submit">Se connecter</button>
 </form>
+</section>
 
 <?php include '../includes/footer.php'; ?>

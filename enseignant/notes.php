@@ -164,6 +164,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Saisie des notes</h1>
+    <p class="page-subtitle">Formule officielle : controle 30%, examen 50%, projet 20%. Les notes doivent etre renseignees entre 0 et 20.</p>
 
     <?php if ($message): ?>
         <p class="success"><?php echo htmlspecialchars($message); ?></p>
@@ -236,7 +237,11 @@ include __DIR__ . '/../includes/header.php';
                                 <td><input type="number" step="0.01" min="0" max="20" name="notes[<?php echo $etu['id_etudiant']; ?>][note_exam]" value="<?php echo htmlspecialchars($etu['note_exam'] ?? ''); ?>" <?php echo $disabled; ?>></td>
                                 <td><input type="number" step="0.01" min="0" max="20" name="notes[<?php echo $etu['id_etudiant']; ?>][note_projet]" value="<?php echo htmlspecialchars($etu['note_projet'] ?? ''); ?>" <?php echo $disabled; ?>></td>
                                 <td><?php echo isset($etu['moyenne']) ? number_format($etu['moyenne'], 2) : '-'; ?></td>
-                                <td><?php echo $etu['validee'] ? 'Validee' : 'Non validee'; ?></td>
+                                <td>
+                                    <span class="badge <?php echo $etu['validee'] ? 'badge-success' : 'badge-warning'; ?>">
+                                        <?php echo $etu['validee'] ? 'Validee' : 'A valider'; ?>
+                                    </span>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -248,7 +253,7 @@ include __DIR__ . '/../includes/header.php';
             </table>
 
             <button type="submit" name="enregistrer_notes">Enregistrer les notes</button>
-            <button type="submit" name="valider_notes" onclick="return confirm('Valider definitivement les notes ?');">Valider les notes</button>
+            <button type="submit" name="valider_notes" onclick="return confirm('Valider definitivement les notes ?');">Valider definitivement</button>
         </form>
     <?php endif; ?>
 </section>

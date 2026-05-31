@@ -209,7 +209,8 @@ if ($filtre_enseignant > 0) {
     $params[] = $filtre_enseignant;
 }
 
-$sql_liste = "SELECT cours.*, enseignant.numero_enseignant
+$sql_liste = "SELECT cours.*, enseignant.numero_enseignant,
+                     (SELECT COUNT(*) FROM inscription WHERE inscription.id_cours = cours.id_cours AND inscription.statut = 'inscrit') AS nb_inscrits
               FROM cours
               LEFT JOIN enseignant ON cours.id_enseignant = enseignant.id_enseignant";
 if (!empty($where)) {
@@ -231,6 +232,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Gestion des cours</h1>
+    <p class="page-subtitle">Creation, modification et suivi des places disponibles par cours.</p>
 
     <?php if ($message): ?><p class="success"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
     <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
@@ -324,10 +326,16 @@ include __DIR__ . '/../includes/header.php';
     </section>
 
     <table>
-        <thead><tr><th>Code</th><th>Titre</th><th>Jour</th><th>Debut</th><th>Fin</th><th>Salle</th><th>Semestre</th><th>Capacite</th><th>Enseignant</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Code</th><th>Titre</th><th>Jour</th><th>Debut</th><th>Fin</th><th>Salle</th><th>Semestre</th><th>Places</th><th>Etat</th><th>Enseignant</th><th>Actions</th></tr></thead>
         <tbody>
             <?php if ($resultat && mysqli_num_rows($resultat) > 0): ?>
                 <?php while ($cours = mysqli_fetch_assoc($resultat)): ?>
+                    <?php
+                    $nb_inscrits = (int) ($cours['nb_inscrits'] ?? 0);
+                    $capacite = (int) $cours['capacite_max'];
+                    $places_restantes = max(0, $capacite - $nb_inscrits);
+                    $cours_complet = $nb_inscrits >= $capacite;
+                    ?>
                     <tr>
                         <td><?php echo htmlspecialchars($cours['code_cours']); ?></td>
                         <td><?php echo htmlspecialchars($cours['titre']); ?></td>
@@ -336,7 +344,13 @@ include __DIR__ . '/../includes/header.php';
                         <td><?php echo htmlspecialchars($cours['heure_fin']); ?></td>
                         <td><?php echo htmlspecialchars($cours['salle']); ?></td>
                         <td><?php echo htmlspecialchars($cours['semestre']); ?></td>
-                        <td><?php echo htmlspecialchars($cours['capacite_max']); ?></td>
+                        <td><?php echo htmlspecialchars($nb_inscrits . ' / ' . $capacite); ?></td>
+                        <td>
+                            <span class="badge <?php echo $cours_complet ? 'badge-danger' : 'badge-success'; ?>">
+                                <?php echo $cours_complet ? 'Complet' : 'Disponible'; ?>
+                            </span>
+                            <span class="muted"><?php echo $places_restantes; ?> place(s)</span>
+                        </td>
                         <td><?php echo htmlspecialchars($cours['numero_enseignant'] ?? 'Non defini'); ?></td>
                         <td>
                             <a class="button secondary" href="cours.php?modifier=<?php echo $cours['id_cours']; ?>">Modifier</a>
@@ -345,7 +359,7 @@ include __DIR__ . '/../includes/header.php';
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
-                <tr><td colspan="10">Aucun cours trouve.</td></tr>
+                <tr><td colspan="11">Aucun cours trouve.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>

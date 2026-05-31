@@ -14,6 +14,7 @@ include __DIR__ . '/../includes/header.php';
 
 <section class="container">
     <h1>Dashboard etudiant</h1>
+    <p class="page-subtitle">Suivi rapide des cours, demandes d'inscription, notes et notifications.</p>
 
     <?php
     $stmt_cours = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM inscription WHERE id_etudiant = ? AND statut = 'inscrit'");
@@ -25,11 +26,23 @@ include __DIR__ . '/../includes/header.php';
     mysqli_stmt_bind_param($stmt_notes, "i", $id_etudiant);
     mysqli_stmt_execute($stmt_notes);
     $total_notes = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_notes))['total'] ?? 0;
+
+    $stmt_demandes = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM inscription WHERE id_etudiant = ? AND statut = 'en_attente'");
+    mysqli_stmt_bind_param($stmt_demandes, "i", $id_etudiant);
+    mysqli_stmt_execute($stmt_demandes);
+    $total_demandes = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_demandes))['total'] ?? 0;
+
+    $stmt_moyenne = mysqli_prepare($conn, "SELECT AVG(moyenne) AS moyenne_generale FROM note WHERE id_etudiant = ? AND validee = 1");
+    mysqli_stmt_bind_param($stmt_moyenne, "i", $id_etudiant);
+    mysqli_stmt_execute($stmt_moyenne);
+    $moyenne_generale = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_moyenne))['moyenne_generale'] ?? null;
     ?>
 
     <section class="stats-grid">
         <article class="stat-card"><h2>Cours inscrits</h2><p><?php echo $total_cours; ?></p></article>
+        <article class="stat-card"><h2>Demandes en attente</h2><p><?php echo $total_demandes; ?></p></article>
         <article class="stat-card"><h2>Notes disponibles</h2><p><?php echo $total_notes; ?></p></article>
+        <article class="stat-card"><h2>Moyenne generale</h2><p><?php echo $moyenne_generale !== null ? number_format($moyenne_generale, 2) : '-'; ?></p></article>
     </section>
 
     <section class="menu-cards">
@@ -67,7 +80,7 @@ include __DIR__ . '/../includes/header.php';
                     <?php while ($notification = mysqli_fetch_assoc($notifications)): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($notification['message']); ?></td>
-                            <td><?php echo htmlspecialchars($notification['type_notification']); ?></td>
+                            <td><span class="badge badge-info"><?php echo htmlspecialchars($notification['type_notification']); ?></span></td>
                             <td><?php echo htmlspecialchars($notification['date_creation']); ?></td>
                         </tr>
                     <?php endwhile; ?>
