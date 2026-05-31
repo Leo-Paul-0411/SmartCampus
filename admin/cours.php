@@ -15,6 +15,8 @@ $filtre_jour = trim($_GET['jour'] ?? '');
 $filtre_enseignant = intval($_GET['id_enseignant'] ?? 0);
 $tri = $_GET['tri'] ?? 'code';
 
+// Lors d'une modification de cours, on evite de creer un conflit horaire
+// pour les etudiants deja inscrits a ce cours.
 function conflit_horaire_modification_cours($conn, $id_cours, $jour, $heure_debut, $heure_fin)
 {
     $sql = "SELECT COUNT(*) AS total
@@ -186,6 +188,7 @@ $where = [];
 $types = "";
 $params = [];
 
+// Recherche, filtres et tri restent simples pour garder une page admin lisible.
 if ($recherche !== '') {
     $where[] = "(cours.code_cours LIKE ? OR cours.titre LIKE ?)";
     $mot_cle = "%" . $recherche . "%";

@@ -1,4 +1,6 @@
 <?php
+// Fonctions metier partagees entre les pages admin, enseignant et etudiant.
+// Elles centralisent les controles importants pour les inscriptions et notifications.
 
 function securiser($valeur)
 {

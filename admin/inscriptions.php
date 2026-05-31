@@ -5,6 +5,9 @@ include '../includes/fonctions.php';
 
 verifier_role('admin');
 
+// Workflow inscription :
+// etudiant -> demande en_attente -> validation/refus admin -> inscrit/desinscrit.
+// Les controles metier sont appliques avant toute inscription active.
 $message = "";
 $type_message = "";
 $filtre_cours = intval($_GET['id_cours'] ?? 0);

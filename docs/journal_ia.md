@@ -1,29 +1,49 @@
-# Journal d’utilisation de l’IA - SmartCampus
+# Journal d'utilisation de l'IA - SmartCampus
 
-Ce fichier sert à garder une trace de l’utilisation de l’IA dans le projet. L’IA est utilisée comme aide à la génération, à la correction et à l’explication du code. Chaque membre reste responsable de comprendre, tester et valider les modifications ajoutées au projet.
+Ce document explique comment l'IA a ete utilisee pendant le projet. L'IA a servi d'assistant de travail, mais les choix finaux, les tests et les arbitrages restent sous la responsabilite de l'equipe.
 
-## Entrée type
+## Outils utilises
 
-Date :
-Membre :
-Branche :
-Fonctionnalité :
-Outil IA utilisé :
-Prompt résumé :
-Fichiers modifiés :
-Vérifications réalisées :
-Problèmes rencontrés :
-Correction effectuée :
+- ChatGPT
+- Codex
 
-## Exemple
+## Taches ou l'IA a aide
 
-Date : 29/05/2026
-Membre : Tristan
-Branche : Tristan
-Fonctionnalité : initialisation de la structure
-Outil IA utilisé : Codex / ChatGPT
-Prompt résumé : création de l’arborescence initiale du projet selon le document technique
-Fichiers modifiés : dossiers du projet, README.md, database/smartcampus.sql
-Vérifications réalisées : test WAMP, import phpMyAdmin, affichage de login.php
-Problèmes rencontrés : aucun problème bloquant
-Correction effectuée : aucune
+- Audit du code apres integration des differentes parties.
+- Detection de bugs PHP, SQL et chemins `include`.
+- Correction d'incoherences entre PHP et la base MySQL.
+- Amelioration des regles metier des inscriptions.
+- Clarification du workflow inscription : demande, attente, validation, refus.
+- Aide a la generation de prompts de travail.
+- Documentation du projet et preparation de la soutenance.
+- Amelioration UX/CSS en restant dans une architecture PHP simple.
+
+## Exemples de reponses utiles
+
+- Reperage de l'obligation d'utiliser `$conn` partout.
+- Reperage de la colonne officielle `note_exam`.
+- Proposition de regles pour eviter la double inscription.
+- Proposition de controles pour la capacite maximale et les conflits horaires.
+- Proposition d'un parcours de test admin / enseignant / etudiant.
+- Aide a la structuration du README final.
+
+## Limites et erreurs rencontrees
+
+- Certaines analyses ont pu signaler un conflit sur `db.php` a partir d'un zip ou d'un etat de projet qui n'etait pas a jour.
+- L'IA propose parfois de trop restructurer le projet ; l'equipe a choisi de garder une architecture PHP procedurale simple.
+- Les corrections doivent toujours etre relues pour verifier qu'elles correspondent au niveau du projet.
+- Les tests navigateur restent indispensables.
+- Les imports SQL doivent etre testes avec WAMP/phpMyAdmin.
+
+## Validations realisees par l'equipe
+
+- Tests navigateur sur les espaces admin, enseignant et etudiant.
+- Import de `database/smartcampus.sql`.
+- Verification des comptes de test.
+- Verification du parcours d'inscription.
+- Verification de la saisie et de la validation des notes.
+- Verification de la coherence generale avant soutenance.
+
+## Conclusion
+
+L'IA a ete utilisee comme assistant pour gagner du temps, analyser le code et produire de la documentation. Elle n'a pas remplace le travail de conception, de test et de validation de l'equipe. Les propositions ont ete adaptees et simplifiees pour rester coherentes avec le sujet, WAMP, PHP/MySQL et le niveau attendu.

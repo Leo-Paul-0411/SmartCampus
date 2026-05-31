@@ -1,121 +1,87 @@
-# Répartition du travail - SmartCampus
+# Repartition du travail - SmartCampus
 
-## Règles générales
+Ce document presente la repartition finale du travail pour la version rendue de SmartCampus.
 
-* Personne ne travaille directement sur main.
-* Chaque membre travaille sur sa branche.
-* Une Pull Request est obligatoire avant intégration dans main.
-* Un commit doit correspondre à une seule petite tâche.
-* Les gros commits sont interdits.
-* Les noms des tables et attributs du document technique ne doivent pas être modifiés.
-* Chaque fonctionnalité doit être testée localement avec WAMP avant Pull Request.
+## 1. Tristan
 
-## Branches
+- Integration globale du projet.
+- Merge final des differentes parties.
+- Corrections PHP / SQL apres integration.
+- Connexion MySQL et coherence autour de `$conn`.
+- Authentification et redirection selon le role.
+- Page d'inscriptions et workflow admin.
+- Regles metier : double inscription, capacite maximale, conflit horaire.
+- Tests WAMP et verification de l'import SQL.
+- Coordination de l'utilisation de Codex / IA.
+- Documentation finale.
+- Preparation de la soutenance.
 
-* main : version stable du projet
-* Tristan : base de données, authentification, règles métier, intégration
-* Nicolas : espace administrateur, dashboard, gestion des étudiants, enseignants et cours
-* Leo-Paul : espace enseignant, espace étudiant, notes, emploi du temps, CSS
+## 2. Nicolas
 
-## Tristan
+- Espace administrateur.
+- Dashboard administrateur.
+- Gestion des etudiants.
+- Gestion des enseignants.
+- Gestion des cours.
+- Inscriptions cote administrateur.
+- Tableaux et formulaires de gestion.
 
-Fichiers principaux :
+## 3. Leo-Paul
 
-* database/smartcampus.sql
-* config/db.php
-* includes/auth.php
-* includes/fonctions.php
-* public/login.php
-* public/logout.php
-* admin/inscriptions.php
+- Espace enseignant.
+- Espace etudiant.
+- Consultation des cours.
+- Saisie et affichage des notes.
+- Calcul et affichage des resultats.
+- Emploi du temps etudiant.
+- Pages de consultation.
 
-Responsabilités :
+## 4. Travail collectif
 
-* connexion MySQL
-* données de test
-* authentification
-* sessions
-* redirection selon rôle
-* règles métier des inscriptions
-* double inscription
-* cours complet
-* conflit horaire
-* intégration finale
+- Choix du sujet SmartCampus.
+- Wireframes et storyboard.
+- Definition de la base de donnees.
+- Tests fonctionnels.
+- Preparation du PowerPoint.
+- Corrections finales avant rendu.
+- Harmonisation generale du projet.
 
-## Nicolas
+## 5. Remarque sur l'integration
 
-Fichiers principaux :
+Apres le merge des parties, certaines zones ont ete harmonisees pour rendre le projet coherent et stable :
 
-* admin/dashboard.php
-* admin/etudiants.php
-* admin/enseignants.php
-* admin/cours.php
+- navigation par role ;
+- CSS global ;
+- coherence SQL / PHP ;
+- noms des roles ;
+- workflow des inscriptions ;
+- documentation ;
+- donnees de demonstration.
 
-Responsabilités :
+Ces harmonisations n'ont pas eu pour objectif de changer l'architecture du projet, mais de rendre l'application plus stable, lisible et defendable en soutenance.
 
-* dashboard administrateur
-* statistiques
-* affichage des étudiants
-* affichage des enseignants
-* gestion des cours
-* tableaux administrateur
-
-## Leo-Paul
-
-Fichiers principaux :
-
-* enseignant/dashboard.php
-* enseignant/mes_cours.php
-* enseignant/notes.php
-* etudiant/dashboard.php
-* etudiant/cours.php
-* etudiant/notes.php
-* etudiant/emploi_du_temps.php
-* assets/css/style.css
-* assets/js/script.js
-
-Responsabilités :
-
-* espace enseignant
-* saisie des notes
-* calcul visuel des moyennes
-* espace étudiant
-* consultation des cours
-* consultation des notes
-* emploi du temps
-* amélioration visuelle CSS
-
-## Fichiers sensibles
-
-Ces fichiers ne doivent pas être modifiés sans accord du groupe :
-
-* database/smartcampus.sql
-* config/db.php
-* includes/auth.php
-* includes/fonctions.php
-
-## Noms à respecter
+## Noms importants a respecter
 
 Tables :
 
-* utilisateur
-* notification
-* enseignant
-* etudiant
-* cours
-* note
-* inscription
+- `utilisateur`
+- `notification`
+- `enseignant`
+- `etudiant`
+- `cours`
+- `note`
+- `inscription`
 
 Attributs importants :
 
-* id_user
-* id_enseignant
-* id_etudiant
-* id_cours
-* note_exam
-* mot_de_passe
+- `id_user`
+- `id_enseignant`
+- `id_etudiant`
+- `id_cours`
+- `note_exam`
+- `mot_de_passe`
 
-Ne jamais utiliser :
+A ne pas utiliser :
 
-* note_examen
-* id_enseignannt
+- une autre variable de connexion que `$conn`
+- une variante de colonne differente de `note_exam`
