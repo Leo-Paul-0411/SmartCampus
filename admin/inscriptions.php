@@ -10,6 +10,7 @@ $type_message = "";
 $filtre_cours = intval($_GET['id_cours'] ?? 0);
 $filtre_statut = trim($_GET['statut'] ?? '');
 
+// Recupere les informations utiles pour traiter une demande d'inscription.
 function infos_inscription($conn, $id_inscription)
 {
     $sql = "SELECT i.id_inscription, i.id_etudiant, i.id_cours, i.statut,
@@ -49,6 +50,7 @@ function modifier_statut_inscription($conn, $id_inscription, $statut)
     return $succes;
 }
 
+// Desinscription administrative : on garde l'historique et on change seulement le statut.
 if (isset($_GET['desinscrire'])) {
     $id_inscription = intval($_GET['desinscrire']);
     $inscription = infos_inscription($conn, $id_inscription);
@@ -63,6 +65,8 @@ if (isset($_GET['desinscrire'])) {
     }
 }
 
+// Workflow admin : une demande etudiante arrive en_attente, puis l'admin valide ou refuse.
+// Avant validation, les regles capacite / conflit horaire / double inscription sont appliquees.
 if (isset($_POST['valider_demande']) || isset($_POST['refuser_demande'])) {
     $id_inscription = intval($_POST['id_inscription'] ?? 0);
     $inscription = infos_inscription($conn, $id_inscription);
@@ -106,6 +110,7 @@ if (isset($_POST['valider_demande']) || isset($_POST['refuser_demande'])) {
     }
 }
 
+// Changement manuel de statut depuis la liste des inscriptions.
 if (isset($_POST['changer_statut'])) {
     $id_inscription = intval($_POST['id_inscription'] ?? 0);
     $nouveau_statut = $_POST['statut'] ?? '';
@@ -139,6 +144,7 @@ if (isset($_POST['changer_statut'])) {
     }
 }
 
+// Inscription directe par l'administrateur, avec les memes controles metier.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inscrire_etudiant'])) {
     $id_etudiant = (int) $_POST['id_etudiant'];
     $id_cours = (int) $_POST['id_cours'];

@@ -5,7 +5,7 @@ function securiser($valeur)
     return htmlspecialchars($valeur, ENT_QUOTES, 'UTF-8');
 }
 
-// Verifie si l'etudiant est deja inscrit au cours.
+// Regle metier : un etudiant ne peut pas avoir deux inscriptions actives au meme cours.
 function etudiant_deja_inscrit($conn, $id_etudiant, $id_cours)
 {
     $sql = "SELECT COUNT(*) AS total
@@ -29,7 +29,8 @@ function etudiant_deja_inscrit($conn, $id_etudiant, $id_cours)
     return $ligne['total'] > 0;
 }
 
-// Recupere une inscription existante pour le couple etudiant / cours.
+// Utile avec la contrainte UNIQUE(id_etudiant, id_cours) :
+// si une ligne existe deja, on la reactive au lieu de refaire un INSERT.
 function recuperer_inscription($conn, $id_etudiant, $id_cours)
 {
     $sql = "SELECT id_inscription, statut
@@ -53,7 +54,7 @@ function recuperer_inscription($conn, $id_etudiant, $id_cours)
     return $inscription;
 }
 
-// Reactive une inscription deja existante.
+// Repasse une ancienne inscription en statut inscrit.
 function reactiver_inscription($conn, $id_inscription)
 {
     $sql = "UPDATE inscription
@@ -73,7 +74,7 @@ function reactiver_inscription($conn, $id_inscription)
     return $succes;
 }
 
-// Verifie si le nombre d'inscrits atteint la capacite maximale du cours.
+// Regle metier : la capacite maximale compte uniquement les inscriptions statut inscrit.
 function cours_est_complet($conn, $id_cours)
 {
     $sql = "SELECT c.capacite_max, COUNT(i.id_inscription) AS total
@@ -101,7 +102,7 @@ function cours_est_complet($conn, $id_cours)
     return $ligne['total'] >= $ligne['capacite_max'];
 }
 
-// Verifie si le nouveau cours chevauche un cours deja inscrit le meme jour.
+// Regle metier : deux cours inscrits ne doivent pas se chevaucher le meme jour.
 function conflit_horaire($conn, $id_etudiant, $id_cours)
 {
     $sql = "SELECT COUNT(*) AS total
@@ -128,7 +129,7 @@ function conflit_horaire($conn, $id_etudiant, $id_cours)
     return $ligne['total'] > 0;
 }
 
-// Cree une notification pour un utilisateur.
+// Notification simple affichee dans l'espace utilisateur.
 function creer_notification($conn, $id_user, $message, $type_notification)
 {
     $sql = "INSERT INTO notification (id_user, message, type_notification)

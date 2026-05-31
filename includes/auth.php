@@ -1,5 +1,5 @@
 <?php
-// Demarrage de la session si elle n'est pas deja active.
+// La session garde l'identite de l'utilisateur connecte et son role.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -19,7 +19,8 @@ function verifier_connexion()
     }
 }
 
-// Verifie que l'utilisateur connecte possede le bon role.
+// Protege les pages par role : admin, enseignant ou etudiant.
+// Le role "administrateur" est accepte comme equivalent de "admin".
 function verifier_role($role)
 {
     verifier_connexion();
@@ -39,7 +40,7 @@ function verifier_role($role)
     }
 }
 
-// Redirige l'utilisateur vers le dashboard correspondant a son role.
+// Apres connexion ou acces refuse, chaque profil retourne vers son espace.
 function rediriger_selon_role($role)
 {
     if ($role === 'administrateur') {

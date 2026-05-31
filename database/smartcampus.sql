@@ -97,33 +97,79 @@ CREATE TABLE inscription (
         FOREIGN KEY (id_cours) REFERENCES cours(id_cours)
 ) ENGINE=InnoDB;
 
-INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, role) VALUES
-('Admin', 'Principal', 'admin@smartcampus.test', 'admin123', 'administrateur'),
-('Martin', 'Paul', 'paul.martin@smartcampus.test', 'enseignant123', 'enseignant'),
-('Durand', 'Alice', 'alice.durand@smartcampus.test', 'etudiant123', 'etudiant'),
-('Bernard', 'Hugo', 'hugo.bernard@smartcampus.test', 'etudiant123', 'etudiant');
+-- Comptes de demonstration.
+-- Les mots de passe sont en clair car public/login.php accepte password_verify
+-- et une comparaison simple pour les donnees de test.
+INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, role, actif) VALUES
+('Admin', 'Principal', 'admin@smartcampus.test', 'admin123', 'administrateur', 1),
+('Martin', 'Paul', 'paul.martin@smartcampus.test', 'enseignant123', 'enseignant', 1),
+('Leroy', 'Sophie', 'sophie.leroy@smartcampus.test', 'enseignant123', 'enseignant', 1),
+('Benali', 'Karim', 'karim.benali@smartcampus.test', 'enseignant123', 'enseignant', 1),
+('Durand', 'Alice', 'alice.durand@smartcampus.test', 'etudiant123', 'etudiant', 1),
+('Bernard', 'Hugo', 'hugo.bernard@smartcampus.test', 'etudiant123', 'etudiant', 1),
+('Petit', 'Emma', 'emma.petit@smartcampus.test', 'etudiant123', 'etudiant', 1),
+('Moreau', 'Nathan', 'nathan.moreau@smartcampus.test', 'etudiant123', 'etudiant', 1),
+('Robert', 'Lea', 'lea.robert@smartcampus.test', 'etudiant123', 'etudiant', 1);
 
 INSERT INTO enseignant (numero_enseignant, specialite, bureau, telephone, id_user) VALUES
-('ENS001', 'Informatique', 'B201', '0600000001', 2);
+('ENS001', 'Informatique', 'B201', '0600000001', 2),
+('ENS002', 'Mathematiques', 'B202', '0600000002', 3),
+('ENS003', 'Reseaux', 'B203', '0600000003', 4);
 
 INSERT INTO etudiant (numero_etudiant, niveau, groupe_classe, date_naissance, telephone, id_user) VALUES
-('ETU001', 'ING2', 'Groupe A', '2004-03-12', '0611111111', 3),
-('ETU002', 'ING2', 'Groupe B', '2003-11-20', '0622222222', 4);
+('ETU001', 'ING2', 'Groupe A', '2004-03-12', '0611111111', 5),
+('ETU002', 'ING2', 'Groupe B', '2003-11-20', '0622222222', 6),
+('ETU003', 'ING2', 'Groupe A', '2004-06-05', '0633333333', 7),
+('ETU004', 'ING2', 'Groupe C', '2003-09-17', '0644444444', 8),
+('ETU005', 'ING2', 'Groupe B', '2004-01-28', '0655555555', 9);
 
-INSERT INTO cours (code_cours, titre, description, capacite_max, jour, heure_debut, heure_fin, salle, semestre, id_enseignant) VALUES
-('INFO101', 'Programmation PHP', 'Bases de PHP et MySQL', 30, 'Lundi', '09:00:00', '11:00:00', 'S101', 'Semestre 1', 1),
-('INFO102', 'Base de donnees', 'Modelisation et SQL', 25, 'Mardi', '14:00:00', '16:00:00', 'S102', 'Semestre 1', 1);
+INSERT INTO cours (
+    code_cours,
+    titre,
+    description,
+    capacite_max,
+    jour,
+    heure_debut,
+    heure_fin,
+    salle,
+    semestre,
+    id_enseignant
+) VALUES
+('INFO101', 'Programmation PHP', 'Bases de PHP, formulaires et acces MySQL.', 3, 'Lundi', '09:00:00', '11:00:00', 'S101', 'Semestre 1', 1),
+('INFO102', 'Base de donnees', 'Modelisation relationnelle et requetes SQL.', 2, 'Mardi', '14:00:00', '16:00:00', 'S102', 'Semestre 1', 1),
+('WEB201', 'JavaScript avance', 'JavaScript moderne et interactions web.', 3, 'Mardi', '15:00:00', '17:00:00', 'S103', 'Semestre 1', 1),
+('MATH201', 'Analyse numerique', 'Methodes numeriques pour ingenieurs.', 4, 'Mercredi', '10:00:00', '12:00:00', 'M201', 'Semestre 1', 2),
+('NET201', 'Reseaux et securite', 'Introduction aux reseaux et a la securite.', 2, 'Jeudi', '13:00:00', '15:00:00', 'R301', 'Semestre 1', 3),
+('TESTCAP', 'Cours capacite test', 'Cours utilise pour tester la capacite maximale.', 1, 'Vendredi', '10:00:00', '12:00:00', 'S999', 'Semestre 1', 1);
 
-INSERT INTO inscription (id_etudiant, id_cours, statut) VALUES
-(1, 1, 'inscrit'),
-(2, 1, 'en_attente'),
-(2, 2, 'inscrit');
+INSERT INTO inscription (id_etudiant, id_cours, statut, date_inscription) VALUES
+(1, 1, 'inscrit', '2026-05-01 09:00:00'),
+(2, 2, 'inscrit', '2026-05-01 09:10:00'),
+(3, 1, 'en_attente', '2026-05-02 10:00:00'),
+(4, 1, 'desinscrit', '2026-05-03 11:00:00'),
+(5, 6, 'inscrit', '2026-05-01 09:20:00'),
+(1, 4, 'inscrit', '2026-05-01 09:30:00'),
+(2, 5, 'inscrit', '2026-05-01 09:40:00');
 
-INSERT INTO note (note_controle, note_exam, note_projet, moyenne, validee, date_saisie, date_validation, id_etudiant, id_cours) VALUES
-(14.00, 15.50, 16.00, 15.15, 1, '2026-05-01 10:00:00', '2026-05-02 09:00:00', 1, 1),
-(12.00, 13.00, 14.00, 12.90, 0, '2026-05-03 10:00:00', NULL, 2, 2);
+INSERT INTO note (
+    note_controle,
+    note_exam,
+    note_projet,
+    moyenne,
+    validee,
+    date_saisie,
+    date_validation,
+    id_etudiant,
+    id_cours
+) VALUES
+(14.00, 15.50, 16.00, 15.15, 1, '2026-05-10 10:00:00', '2026-05-11 09:00:00', 1, 1),
+(12.00, 13.00, 14.00, 12.90, 0, '2026-05-10 11:00:00', NULL, 2, 2),
+(15.00, 14.00, 13.00, 14.20, 0, '2026-05-12 10:00:00', NULL, 1, 4),
+(10.00, 11.00, 12.00, 10.90, 0, '2026-05-12 11:00:00', NULL, 2, 5);
 
-INSERT INTO notification (message, type_notification, lue, id_user) VALUES
-('Bienvenue sur SmartCampus.', 'information', 0, 1),
-('Votre cours Programmation PHP est disponible.', 'cours', 0, 2),
-('Votre inscription est enregistree.', 'inscription', 0, 3);
+INSERT INTO notification (message, type_notification, lue, date_creation, id_user) VALUES
+('Bienvenue sur SmartCampus.', 'information', 0, '2026-05-01 08:00:00', 1),
+('Votre inscription au cours Programmation PHP a ete validee.', 'inscription', 0, '2026-05-01 09:05:00', 5),
+('Votre inscription au cours Base de donnees a ete validee.', 'inscription', 0, '2026-05-01 09:15:00', 6),
+('Votre demande pour Programmation PHP est en attente de validation.', 'inscription', 0, '2026-05-02 10:05:00', 7),
+('Votre inscription au cours capacite test a ete validee.', 'inscription', 0, '2026-05-01 09:25:00', 9);

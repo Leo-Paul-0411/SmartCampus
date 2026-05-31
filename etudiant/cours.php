@@ -12,6 +12,8 @@ $id_user = $_SESSION['id_user'] ?? 0;
 $message = "";
 $erreur = "";
 
+// L'etudiant ne s'inscrit pas directement : il cree une demande en_attente.
+// L'administrateur devra ensuite la valider ou la refuser.
 if (isset($_POST['demander_inscription'])) {
     $id_cours = intval($_POST['id_cours'] ?? 0);
 
@@ -61,6 +63,7 @@ if (isset($_POST['demander_inscription'])) {
     }
 }
 
+// Desinscription etudiante : la ligne est conservee avec le statut desinscrit.
 if (isset($_POST['desinscrire'])) {
     $id_inscription = intval($_POST['id_inscription'] ?? 0);
 
@@ -104,6 +107,7 @@ include __DIR__ . '/../includes/header.php';
     <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
 
     <?php
+    // Les cours sont groupes par statut pour rendre le parcours de demonstration plus clair.
     $sql = "SELECT c.id_cours, c.code_cours, c.titre, c.jour, c.heure_debut, c.heure_fin,
                    c.salle, c.semestre, c.capacite_max,
                    u.nom AS enseignant_nom, u.prenom AS enseignant_prenom,

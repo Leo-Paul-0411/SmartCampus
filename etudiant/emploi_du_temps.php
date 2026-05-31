@@ -16,6 +16,7 @@ include __DIR__ . '/../includes/header.php';
     <p class="page-subtitle">Seuls les cours avec le statut inscrit sont affiches.</p>
 
     <?php
+    // L'emploi du temps affiche seulement les cours definitivement inscrits.
     $sql = "SELECT cours.jour, cours.heure_debut, cours.heure_fin, cours.titre, cours.salle,
                    utilisateur.nom, utilisateur.prenom
             FROM inscription

@@ -10,6 +10,7 @@ $id_enseignant = $_SESSION['id_enseignant'] ?? 0;
 $message = "";
 $erreur = "";
 
+// Securite : un enseignant ne peut travailler que sur les cours qui lui appartiennent.
 function cours_appartient_enseignant($conn, $id_cours, $id_enseignant)
 {
     $sql = "SELECT COUNT(*) AS total
@@ -71,6 +72,7 @@ if ($id_cours > 0 && !cours_appartient_enseignant($conn, $id_cours, $id_enseigna
     $id_cours = 0;
 }
 
+// La validation finale verrouille les notes pour eviter les modifications apres publication.
 if ($erreur === "" && isset($_POST['valider_notes'])) {
     if ($id_cours <= 0) {
         $erreur = "Erreur : cours invalide.";
@@ -98,6 +100,7 @@ if ($erreur === "" && isset($_POST['valider_notes'])) {
     }
 }
 
+// Saisie des notes : les champs vides sont refuses et la moyenne est ponderee.
 if ($erreur === "" && isset($_POST['enregistrer_notes'])) {
     if ($id_cours <= 0) {
         $erreur = "Erreur : cours invalide.";

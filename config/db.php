@@ -1,5 +1,6 @@
 <?php
-// Connexion a la base de donnees MySQL avec mysqli.
+// Fichier central de connexion MySQL.
+// Toutes les pages incluent ce fichier et utilisent uniquement la variable $conn.
 
 $serveur = "localhost";
 $utilisateur = "root";
