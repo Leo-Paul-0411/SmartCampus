@@ -120,8 +120,8 @@ INSERT INTO inscription (id_etudiant, id_cours, statut) VALUES
 (2, 2, 'inscrit');
 
 INSERT INTO note (note_controle, note_exam, note_projet, moyenne, validee, date_saisie, date_validation, id_etudiant, id_cours) VALUES
-(14.00, 15.50, 16.00, 15.17, 1, '2026-05-01 10:00:00', '2026-05-02 09:00:00', 1, 1),
-(12.00, 13.00, 14.00, 13.00, 0, '2026-05-03 10:00:00', NULL, 2, 2);
+(14.00, 15.50, 16.00, 15.15, 1, '2026-05-01 10:00:00', '2026-05-02 09:00:00', 1, 1),
+(12.00, 13.00, 14.00, 12.90, 0, '2026-05-03 10:00:00', NULL, 2, 2);
 
 INSERT INTO notification (message, type_notification, lue, id_user) VALUES
 ('Bienvenue sur SmartCampus.', 'information', 0, 1),

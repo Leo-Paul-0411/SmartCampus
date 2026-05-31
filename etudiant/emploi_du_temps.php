@@ -7,7 +7,7 @@ if (function_exists('verifier_role')) {
 }
 
 // TODO : remplacer par l'id etudiant venant de la session quand l'authentification sera finalisee.
-$id_etudiant = $_SESSION['id_etudiant'] ?? 1;
+$id_etudiant = $_SESSION['id_etudiant'] ?? 0;
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -16,9 +16,12 @@ include __DIR__ . '/../includes/header.php';
     <h1>Emploi du temps</h1>
 
     <?php
-    $sql = "SELECT cours.jour, cours.heure_debut, cours.heure_fin, cours.titre, cours.salle
+    $sql = "SELECT cours.jour, cours.heure_debut, cours.heure_fin, cours.titre, cours.salle,
+                   utilisateur.nom, utilisateur.prenom
             FROM inscription
             INNER JOIN cours ON inscription.id_cours = cours.id_cours
+            INNER JOIN enseignant ON cours.id_enseignant = enseignant.id_enseignant
+            INNER JOIN utilisateur ON enseignant.id_user = utilisateur.id_user
             WHERE inscription.id_etudiant = ?
             AND inscription.statut = 'inscrit'
             ORDER BY cours.jour, cours.heure_debut";
@@ -36,6 +39,7 @@ include __DIR__ . '/../includes/header.php';
                 <th>Fin</th>
                 <th>Cours</th>
                 <th>Salle</th>
+                <th>Enseignant</th>
             </tr>
         </thead>
         <tbody>
@@ -47,11 +51,12 @@ include __DIR__ . '/../includes/header.php';
                         <td><?php echo htmlspecialchars($cours['heure_fin']); ?></td>
                         <td><?php echo htmlspecialchars($cours['titre']); ?></td>
                         <td><?php echo htmlspecialchars($cours['salle']); ?></td>
+                        <td><?php echo htmlspecialchars($cours['prenom'] . ' ' . $cours['nom']); ?></td>
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5">Aucun cours dans l'emploi du temps.</td>
+                    <td colspan="6">Aucun cours dans l'emploi du temps.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

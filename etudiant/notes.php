@@ -7,7 +7,7 @@ if (function_exists('verifier_role')) {
 }
 
 // TODO : remplacer par l'id étudiant venant de la session quand l'authentification sera finalisée.
-$id_etudiant = $_SESSION['id_etudiant'] ?? 1;
+$id_etudiant = $_SESSION['id_etudiant'] ?? 0;
 
 include __DIR__ . '/../includes/header.php';
 ?>

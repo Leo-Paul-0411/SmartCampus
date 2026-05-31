@@ -2,6 +2,6 @@
     <footer>
         <p>&copy; SmartCampus</p>
     </footer>
-    <script src="../assets/js/script.js"></script>
+    <script src="/SmartCampus/assets/js/script.js"></script>
 </body>
 </html>
