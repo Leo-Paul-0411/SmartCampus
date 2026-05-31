@@ -7,8 +7,96 @@ verifier_role('admin');
 
 $message = "";
 $type_message = "";
+$filtre_cours = intval($_GET['id_cours'] ?? 0);
+$filtre_statut = trim($_GET['statut'] ?? '');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+function infos_inscription($conn, $id_inscription)
+{
+    $sql = "SELECT i.id_inscription, i.id_etudiant, i.id_cours, i.statut,
+                   e.id_user, c.titre
+            FROM inscription i
+            INNER JOIN etudiant e ON i.id_etudiant = e.id_etudiant
+            INNER JOIN cours c ON i.id_cours = c.id_cours
+            WHERE i.id_inscription = ?";
+    $requete = mysqli_prepare($conn, $sql);
+
+    if (!$requete) {
+        return false;
+    }
+
+    mysqli_stmt_bind_param($requete, "i", $id_inscription);
+    mysqli_stmt_execute($requete);
+    $resultat = mysqli_stmt_get_result($requete);
+    $inscription = mysqli_fetch_assoc($resultat);
+    mysqli_stmt_close($requete);
+
+    return $inscription;
+}
+
+function modifier_statut_inscription($conn, $id_inscription, $statut)
+{
+    $sql = "UPDATE inscription SET statut = ? WHERE id_inscription = ?";
+    $requete = mysqli_prepare($conn, $sql);
+
+    if (!$requete) {
+        return false;
+    }
+
+    mysqli_stmt_bind_param($requete, "si", $statut, $id_inscription);
+    $succes = mysqli_stmt_execute($requete);
+    mysqli_stmt_close($requete);
+
+    return $succes;
+}
+
+if (isset($_GET['desinscrire'])) {
+    $id_inscription = intval($_GET['desinscrire']);
+    $inscription = infos_inscription($conn, $id_inscription);
+
+    if ($inscription && modifier_statut_inscription($conn, $id_inscription, 'desinscrit')) {
+        creer_notification($conn, $inscription['id_user'], "Vous avez ete desinscrit du cours " . $inscription['titre'] . ".", "inscription");
+        $message = "Etudiant desinscrit avec succes.";
+        $type_message = "succes";
+    } else {
+        $message = "Erreur lors de la desinscription.";
+        $type_message = "erreur";
+    }
+}
+
+if (isset($_POST['changer_statut'])) {
+    $id_inscription = intval($_POST['id_inscription'] ?? 0);
+    $nouveau_statut = $_POST['statut'] ?? '';
+    $statuts_autorises = ['inscrit', 'en_attente', 'desinscrit'];
+    $inscription = infos_inscription($conn, $id_inscription);
+
+    if (!$inscription || !in_array($nouveau_statut, $statuts_autorises, true)) {
+        $message = "Erreur : statut invalide.";
+        $type_message = "erreur";
+    } elseif ($nouveau_statut === 'inscrit' && $inscription['statut'] !== 'inscrit') {
+        if (cours_est_complet($conn, $inscription['id_cours'])) {
+            $message = "Erreur : ce cours est complet.";
+            $type_message = "erreur";
+        } elseif (conflit_horaire($conn, $inscription['id_etudiant'], $inscription['id_cours'])) {
+            $message = "Erreur : conflit horaire pour cet etudiant.";
+            $type_message = "erreur";
+        } elseif (modifier_statut_inscription($conn, $id_inscription, 'inscrit')) {
+            creer_notification($conn, $inscription['id_user'], "Votre inscription au cours " . $inscription['titre'] . " est active.", "inscription");
+            $message = "Inscription activee avec succes.";
+            $type_message = "succes";
+        }
+    } elseif (modifier_statut_inscription($conn, $id_inscription, $nouveau_statut)) {
+        if ($nouveau_statut === 'desinscrit') {
+            creer_notification($conn, $inscription['id_user'], "Vous avez ete desinscrit du cours " . $inscription['titre'] . ".", "inscription");
+        }
+        $message = "Statut modifie avec succes.";
+        $type_message = "succes";
+    } else {
+        $message = "Erreur lors de la modification du statut.";
+        $type_message = "erreur";
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inscrire_etudiant'])) {
     $id_etudiant = (int) $_POST['id_etudiant'];
     $id_cours = (int) $_POST['id_cours'];
     $inscription_existante = false;
@@ -21,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($message === "" && $inscription_existante && $inscription_existante['statut'] === 'inscrit') {
-        $message = "Erreur : étudiant déjà inscrit.";
+        $message = "Erreur : etudiant deja inscrit.";
         $type_message = "erreur";
     } elseif ($message === "" && cours_est_complet($conn, $id_cours)) {
         $message = "Erreur : ce cours est complet.";
@@ -44,35 +132,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $type_message = "erreur";
             }
         } else {
-        $statut = "inscrit";
-        $sql_insert = "INSERT INTO inscription (id_etudiant, id_cours, statut)
-                       VALUES (?, ?, ?)";
-        $requete_insert = mysqli_prepare($conn, $sql_insert);
+            $statut = "inscrit";
+            $sql_insert = "INSERT INTO inscription (id_etudiant, id_cours, statut)
+                           VALUES (?, ?, ?)";
+            $requete_insert = mysqli_prepare($conn, $sql_insert);
 
-        if ($requete_insert) {
-            mysqli_stmt_bind_param($requete_insert, "iis", $id_etudiant, $id_cours, $statut);
+            if ($requete_insert) {
+                mysqli_stmt_bind_param($requete_insert, "iis", $id_etudiant, $id_cours, $statut);
 
-            if (mysqli_stmt_execute($requete_insert)) {
-                $message = "Inscription ajoutee avec succes.";
-                $type_message = "succes";
-                $inscription_reussie = true;
+                if (mysqli_stmt_execute($requete_insert)) {
+                    $message = "Inscription ajoutee avec succes.";
+                    $type_message = "succes";
+                    $inscription_reussie = true;
+                } else {
+                    $message = "Erreur lors de l'inscription : " . mysqli_error($conn);
+                    $type_message = "erreur";
+                }
+
+                mysqli_stmt_close($requete_insert);
             } else {
-                $message = "Erreur lors de l'inscription : " . mysqli_error($conn);
+                $message = "Erreur de preparation de la requete : " . mysqli_error($conn);
                 $type_message = "erreur";
             }
-
-            mysqli_stmt_close($requete_insert);
-        } else {
-            $message = "Erreur de preparation de la requete : " . mysqli_error($conn);
-            $type_message = "erreur";
-        }
         }
 
         if ($inscription_reussie) {
-            // Recuperation du compte utilisateur de l'etudiant pour creer la notification.
-            $sql_etudiant = "SELECT id_user
-                             FROM etudiant
-                             WHERE id_etudiant = ?";
+            $sql_etudiant = "SELECT id_user FROM etudiant WHERE id_etudiant = ?";
             $requete_etudiant = mysqli_prepare($conn, $sql_etudiant);
 
             if ($requete_etudiant) {
@@ -83,12 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_close($requete_etudiant);
 
                 if ($etudiant) {
-                    creer_notification(
-                        $conn,
-                        $etudiant['id_user'],
-                        "Vous avez ete inscrit a un cours.",
-                        "inscription"
-                    );
+                    creer_notification($conn, $etudiant['id_user'], "Vous avez ete inscrit a un cours.", "inscription");
                 }
             }
         }
@@ -100,6 +180,7 @@ $result_etudiants = mysqli_query(
     "SELECT e.id_etudiant, e.numero_etudiant, u.nom, u.prenom
      FROM etudiant e
      INNER JOIN utilisateur u ON e.id_user = u.id_user
+     WHERE u.actif = 1
      ORDER BY u.nom, u.prenom"
 );
 
@@ -110,17 +191,41 @@ $result_cours = mysqli_query(
      ORDER BY code_cours"
 );
 
-$result_inscriptions = mysqli_query(
-    $conn,
-    "SELECT i.date_inscription, i.statut,
-            u.nom, u.prenom, e.numero_etudiant,
-            c.code_cours, c.titre
-     FROM inscription i
-     INNER JOIN etudiant e ON i.id_etudiant = e.id_etudiant
-     INNER JOIN utilisateur u ON e.id_user = u.id_user
-     INNER JOIN cours c ON i.id_cours = c.id_cours
-     ORDER BY i.date_inscription DESC"
-);
+$where = [];
+$types = "";
+$params = [];
+
+if ($filtre_cours > 0) {
+    $where[] = "i.id_cours = ?";
+    $types .= "i";
+    $params[] = $filtre_cours;
+}
+if (in_array($filtre_statut, ['inscrit', 'en_attente', 'desinscrit'], true)) {
+    $where[] = "i.statut = ?";
+    $types .= "s";
+    $params[] = $filtre_statut;
+}
+
+$sql_inscriptions = "SELECT i.id_inscription, i.date_inscription, i.statut,
+                            u.nom, u.prenom, e.numero_etudiant,
+                            c.code_cours, c.titre
+                     FROM inscription i
+                     INNER JOIN etudiant e ON i.id_etudiant = e.id_etudiant
+                     INNER JOIN utilisateur u ON e.id_user = u.id_user
+                     INNER JOIN cours c ON i.id_cours = c.id_cours";
+if (!empty($where)) {
+    $sql_inscriptions .= " WHERE " . implode(" AND ", $where);
+}
+$sql_inscriptions .= " ORDER BY i.date_inscription DESC";
+
+if (!empty($params)) {
+    $stmt_inscriptions = mysqli_prepare($conn, $sql_inscriptions);
+    mysqli_stmt_bind_param($stmt_inscriptions, $types, ...$params);
+    mysqli_stmt_execute($stmt_inscriptions);
+    $result_inscriptions = mysqli_stmt_get_result($stmt_inscriptions);
+} else {
+    $result_inscriptions = mysqli_query($conn, $sql_inscriptions);
+}
 
 include '../includes/header.php';
 ?>
@@ -128,7 +233,7 @@ include '../includes/header.php';
 <h2>Gestion des inscriptions</h2>
 
 <?php if ($message !== "") { ?>
-    <p><?php echo htmlspecialchars($message); ?></p>
+    <p class="<?php echo $type_message === 'succes' ? 'success' : 'error'; ?>"><?php echo htmlspecialchars($message); ?></p>
 <?php } ?>
 
 <section>
@@ -154,6 +259,7 @@ include '../includes/header.php';
             <select id="id_cours" name="id_cours" required>
                 <option value="">-- Choisir un cours --</option>
                 <?php if ($result_cours) { ?>
+                    <?php mysqli_data_seek($result_cours, 0); ?>
                     <?php while ($cours = mysqli_fetch_assoc($result_cours)) { ?>
                         <option value="<?php echo htmlspecialchars($cours['id_cours']); ?>">
                             <?php echo htmlspecialchars($cours['code_cours'] . ' - ' . $cours['titre'] . ' (' . $cours['jour'] . ', ' . $cours['heure_debut'] . ' - ' . $cours['heure_fin'] . ')'); ?>
@@ -163,12 +269,34 @@ include '../includes/header.php';
             </select>
         </p>
 
-        <button type="submit">Inscrire</button>
+        <button type="submit" name="inscrire_etudiant">Inscrire</button>
     </form>
 </section>
 
 <section>
     <h3>Liste des inscriptions</h3>
+
+    <form method="get" action="inscriptions.php" class="toolbar">
+        <select name="id_cours">
+            <option value="0">Tous les cours</option>
+            <?php if ($result_cours) { ?>
+                <?php mysqli_data_seek($result_cours, 0); ?>
+                <?php while ($cours = mysqli_fetch_assoc($result_cours)) { ?>
+                    <option value="<?php echo htmlspecialchars($cours['id_cours']); ?>" <?php if ($filtre_cours === (int) $cours['id_cours']) echo 'selected'; ?>>
+                        <?php echo htmlspecialchars($cours['code_cours'] . ' - ' . $cours['titre']); ?>
+                    </option>
+                <?php } ?>
+            <?php } ?>
+        </select>
+        <select name="statut">
+            <option value="">Tous les statuts</option>
+            <option value="inscrit" <?php if ($filtre_statut === 'inscrit') echo 'selected'; ?>>Inscrit</option>
+            <option value="en_attente" <?php if ($filtre_statut === 'en_attente') echo 'selected'; ?>>En attente</option>
+            <option value="desinscrit" <?php if ($filtre_statut === 'desinscrit') echo 'selected'; ?>>Desinscrit</option>
+        </select>
+        <button type="submit">Filtrer</button>
+        <a class="button secondary" href="inscriptions.php">Reinitialiser</a>
+    </form>
 
     <table border="1">
         <thead>
@@ -177,26 +305,38 @@ include '../includes/header.php';
                 <th>cours</th>
                 <th>date_inscription</th>
                 <th>statut</th>
+                <th>actions</th>
             </tr>
         </thead>
         <tbody>
             <?php if ($result_inscriptions && mysqli_num_rows($result_inscriptions) > 0) { ?>
                 <?php while ($inscription = mysqli_fetch_assoc($result_inscriptions)) { ?>
                     <tr>
-                        <td>
-                            <?php echo htmlspecialchars($inscription['prenom'] . ' ' . $inscription['nom'] . ' - ' . $inscription['numero_etudiant']); ?>
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($inscription['code_cours'] . ' - ' . $inscription['titre']); ?>
-                        </td>
+                        <td><?php echo htmlspecialchars($inscription['prenom'] . ' ' . $inscription['nom'] . ' - ' . $inscription['numero_etudiant']); ?></td>
+                        <td><?php echo htmlspecialchars($inscription['code_cours'] . ' - ' . $inscription['titre']); ?></td>
                         <td><?php echo htmlspecialchars($inscription['date_inscription']); ?></td>
-                        <td><?php echo htmlspecialchars($inscription['statut']); ?></td>
+                        <td>
+                            <form method="post" action="inscriptions.php">
+                                <input type="hidden" name="id_inscription" value="<?php echo htmlspecialchars($inscription['id_inscription']); ?>">
+                                <select name="statut">
+                                    <option value="inscrit" <?php if ($inscription['statut'] === 'inscrit') echo 'selected'; ?>>inscrit</option>
+                                    <option value="en_attente" <?php if ($inscription['statut'] === 'en_attente') echo 'selected'; ?>>en_attente</option>
+                                    <option value="desinscrit" <?php if ($inscription['statut'] === 'desinscrit') echo 'selected'; ?>>desinscrit</option>
+                                </select>
+                                <button type="submit" name="changer_statut">Changer</button>
+                            </form>
+                        </td>
+                        <td>
+                            <?php if ($inscription['statut'] === 'inscrit') { ?>
+                                <a class="button danger js-confirm-delete" href="inscriptions.php?desinscrire=<?php echo htmlspecialchars($inscription['id_inscription']); ?>" data-confirm="Desinscrire cet etudiant ?">Desinscrire</a>
+                            <?php } else { ?>
+                                -
+                            <?php } ?>
+                        </td>
                     </tr>
                 <?php } ?>
             <?php } else { ?>
-                <tr>
-                    <td colspan="4">Aucune inscription trouvee.</td>
-                </tr>
+                <tr><td colspan="5">Aucune inscription trouvee.</td></tr>
             <?php } ?>
         </tbody>
     </table>

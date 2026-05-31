@@ -27,14 +27,21 @@ include __DIR__ . '/../includes/header.php';
     ?>
 
     <section class="stats-grid">
-        <article class="stat-card"><h2>Étudiants</h2><p><?php echo $total_etudiants; ?></p></article>
+        <article class="stat-card"><h2>Etudiants</h2><p><?php echo $total_etudiants; ?></p></article>
         <article class="stat-card"><h2>Enseignants</h2><p><?php echo $total_enseignants; ?></p></article>
         <article class="stat-card"><h2>Cours</h2><p><?php echo $total_cours; ?></p></article>
         <article class="stat-card"><h2>Inscriptions</h2><p><?php echo $total_inscriptions; ?></p></article>
     </section>
 
+    <section class="menu-cards">
+        <a class="card-link" href="/SmartCampus/admin/etudiants.php">Gestion etudiants</a>
+        <a class="card-link" href="/SmartCampus/admin/enseignants.php">Gestion enseignants</a>
+        <a class="card-link" href="/SmartCampus/admin/cours.php">Gestion cours</a>
+        <a class="card-link" href="/SmartCampus/admin/inscriptions.php">Gestion inscriptions</a>
+    </section>
+
     <section>
-        <h2>Inscriptions récentes</h2>
+        <h2>Inscriptions recentes</h2>
         <?php
         $sql = "
             SELECT inscription.date_inscription, inscription.statut, utilisateur.nom, utilisateur.prenom, cours.titre
@@ -48,7 +55,7 @@ include __DIR__ . '/../includes/header.php';
         $resultat = mysqli_query($conn, $sql);
         ?>
         <table>
-            <thead><tr><th>Étudiant</th><th>Cours</th><th>Date</th><th>Statut</th></tr></thead>
+            <thead><tr><th>Etudiant</th><th>Cours</th><th>Date</th><th>Statut</th></tr></thead>
             <tbody>
                 <?php if ($resultat && mysqli_num_rows($resultat) > 0): ?>
                     <?php while ($ligne = mysqli_fetch_assoc($resultat)): ?>
@@ -60,7 +67,7 @@ include __DIR__ . '/../includes/header.php';
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="4">Aucune inscription récente.</td></tr>
+                    <tr><td colspan="4">Aucune inscription recente.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -68,4 +75,3 @@ include __DIR__ . '/../includes/header.php';
 </section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
-
