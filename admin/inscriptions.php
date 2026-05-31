@@ -294,8 +294,8 @@ include '../includes/header.php';
     <p class="<?php echo $type_message === 'succes' ? 'success' : 'error'; ?>"><?php echo htmlspecialchars($message); ?></p>
 <?php } ?>
 
-<section>
-    <h3>Inscrire un etudiant a un cours</h3>
+<section class="section-card">
+    <h3>Nouvelle inscription administrative</h3>
 
     <form method="post" action="inscriptions.php">
         <p>
@@ -331,7 +331,7 @@ include '../includes/header.php';
     </form>
 </section>
 
-<section>
+<section class="section-card">
     <h3>Demandes en attente</h3>
     <p class="alert alert-info">La validation controle automatiquement la capacite, le conflit horaire et la double inscription.</p>
 
@@ -361,13 +361,13 @@ include '../includes/header.php';
                     </tr>
                 <?php } ?>
             <?php } else { ?>
-                <tr><td colspan="4">Aucune demande en attente.</td></tr>
+                <tr><td colspan="4"><span class="empty-state">Aucune demande en attente.</span></td></tr>
             <?php } ?>
         </tbody>
     </table>
 </section>
 
-<section>
+<section class="section-card">
     <h3>Liste des inscriptions</h3>
 
     <form method="get" action="inscriptions.php" class="toolbar">
@@ -439,7 +439,7 @@ include '../includes/header.php';
                     </tr>
                 <?php } ?>
             <?php } else { ?>
-                <tr><td colspan="5">Aucune inscription trouvee.</td></tr>
+                <tr><td colspan="5"><span class="empty-state">Aucune inscription trouvee.</span></td></tr>
             <?php } ?>
         </tbody>
     </table>

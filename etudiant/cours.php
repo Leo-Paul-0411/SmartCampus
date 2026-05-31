@@ -216,7 +216,7 @@ include __DIR__ . '/../includes/header.php';
                     </tbody>
                 </table>
             <?php else: ?>
-                <p class="muted">Aucun cours dans cette categorie.</p>
+                <p class="empty-state">Aucun cours dans cette categorie.</p>
             <?php endif; ?>
         </section>
     <?php endforeach; ?>

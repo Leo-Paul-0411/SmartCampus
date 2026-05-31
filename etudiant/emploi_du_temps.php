@@ -38,9 +38,10 @@ include __DIR__ . '/../includes/header.php';
     }
     ?>
 
+    <section class="schedule">
     <?php if (!empty($cours_par_jour)): ?>
         <?php foreach ($cours_par_jour as $jour => $liste_cours): ?>
-            <section class="day-block">
+            <section class="day-block schedule-day">
                 <h2><?php echo htmlspecialchars($jour); ?></h2>
                 <table>
                     <thead>
@@ -55,9 +56,9 @@ include __DIR__ . '/../includes/header.php';
                     <tbody>
                         <?php foreach ($liste_cours as $cours): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($cours['heure_debut']); ?></td>
+                                <td><span class="schedule-time"><?php echo htmlspecialchars($cours['heure_debut']); ?></span></td>
                                 <td><?php echo htmlspecialchars($cours['heure_fin']); ?></td>
-                                <td><?php echo htmlspecialchars($cours['titre']); ?></td>
+                                <td><span class="schedule-course"><?php echo htmlspecialchars($cours['titre']); ?></span></td>
                                 <td><?php echo htmlspecialchars($cours['salle']); ?></td>
                                 <td><?php echo htmlspecialchars($cours['prenom'] . ' ' . $cours['nom']); ?></td>
                             </tr>
@@ -67,8 +68,9 @@ include __DIR__ . '/../includes/header.php';
             </section>
         <?php endforeach; ?>
     <?php else: ?>
-        <p class="alert alert-info">Aucun cours dans l'emploi du temps.</p>
+        <p class="empty-state">Aucun cours dans l'emploi du temps.</p>
     <?php endif; ?>
+    </section>
 </section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

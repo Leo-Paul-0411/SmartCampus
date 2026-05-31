@@ -94,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include '../includes/header.php';
 ?>
 
-<section class="container">
-<h2>Connexion</h2>
-<p class="page-subtitle">Connectez-vous avec un compte admin, enseignant ou etudiant pour afficher la navigation adaptee.</p>
+<section class="container login-card">
+<h2>Connexion a SmartCampus</h2>
+<p class="page-subtitle">Plateforme de gestion academique</p>
 
 <?php if ($message !== "") { ?>
     <p class="error"><?php echo htmlspecialchars($message); ?></p>
