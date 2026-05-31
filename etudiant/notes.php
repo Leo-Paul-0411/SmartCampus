@@ -1,4 +1,5 @@
 <?php
+// Consultation des notes de l'etudiant connecte uniquement.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -8,11 +9,13 @@ if (function_exists('verifier_role')) {
 
 $id_etudiant = $_SESSION['id_etudiant'] ?? 0;
 
+// Moyenne generale affichee seulement a partir des notes validees.
 $stmt_moyenne = mysqli_prepare($conn, "SELECT AVG(moyenne) AS moyenne_generale FROM note WHERE id_etudiant = ? AND validee = 1");
 mysqli_stmt_bind_param($stmt_moyenne, "i", $id_etudiant);
 mysqli_stmt_execute($stmt_moyenne);
 $moyenne_generale = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_moyenne))['moyenne_generale'] ?? null;
 
+// Detail des notes et de leur statut de validation.
 $sql = "SELECT cours.code_cours, cours.titre,
                note.note_controle, note.note_exam, note.note_projet,
                note.moyenne, note.validee

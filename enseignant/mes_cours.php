@@ -1,4 +1,5 @@
 <?php
+// Liste des cours de l'enseignant connecte uniquement.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -8,6 +9,7 @@ if (function_exists('verifier_role')) {
 
 $id_enseignant = $_SESSION['id_enseignant'] ?? 0;
 
+// Le filtre id_enseignant evite d'afficher les cours d'un autre enseignant.
 $sql = "SELECT c.code_cours, c.titre, c.jour, c.heure_debut, c.heure_fin,
                c.salle, c.semestre, c.capacite_max,
                (SELECT COUNT(*) FROM inscription i WHERE i.id_cours = c.id_cours AND i.statut = 'inscrit') AS nb_inscrits

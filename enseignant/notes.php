@@ -1,4 +1,6 @@
 <?php
+// Saisie des notes par l'enseignant.
+// Les notes validees sont verrouillees pour garder une publication stable.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -131,6 +133,7 @@ if ($erreur === "" && isset($_POST['enregistrer_notes'])) {
             $note_controle = (float) $note_controle_saisie;
             $note_exam = (float) $note_exam_saisie;
             $note_projet = (float) $note_projet_saisie;
+            // Moyenne officielle : controle 30%, examen 50%, projet 20%.
             $moyenne = ($note_controle * 0.3) + ($note_exam * 0.5) + ($note_projet * 0.2);
 
             $stmt_existe = mysqli_prepare($conn, "SELECT id_note, validee FROM note WHERE id_etudiant = ? AND id_cours = ?");

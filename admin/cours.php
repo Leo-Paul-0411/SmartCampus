@@ -1,4 +1,5 @@
 <?php
+// Gestion admin des cours : creation, modification, suppression et filtrage.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -44,6 +45,7 @@ function conflit_horaire_modification_cours($conn, $id_cours, $jour, $heure_debu
     return $ligne['total'] > 0;
 }
 
+// Suppression controlee : un cours deja utilise par des inscriptions ou notes est conserve.
 if (isset($_GET['supprimer'])) {
     $id_cours = intval($_GET['supprimer']);
 
@@ -80,6 +82,7 @@ if (isset($_GET['supprimer'])) {
     }
 }
 
+// Ajout / modification : validation des champs et de la coherence horaire.
 if (isset($_POST['ajouter_cours']) || isset($_POST['modifier_cours'])) {
     $id_cours = intval($_POST['id_cours'] ?? 0);
     $code_cours = trim($_POST['code_cours'] ?? '');

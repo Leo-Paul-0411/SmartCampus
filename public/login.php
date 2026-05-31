@@ -1,4 +1,5 @@
 <?php
+// Page publique de connexion : verifie le compte puis initialise la session.
 include '../config/db.php';
 include '../includes/auth.php';
 
@@ -24,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($requete);
 
         if ($utilisateur && $utilisateur['actif'] == 1) {
+            // Les comptes crees par l'application sont hashes.
+            // Les comptes de demonstration SQL peuvent rester en clair.
             $mot_de_passe_valide = password_verify($mot_de_passe, $utilisateur['mot_de_passe'])
                 || $mot_de_passe === $utilisateur['mot_de_passe'];
 
@@ -41,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role'] = $role;
                 unset($_SESSION['id_enseignant'], $_SESSION['id_etudiant']);
 
+                // On conserve aussi l'identifiant metier pour filtrer les pages enseignant.
                 if ($role === 'enseignant') {
                     $sql_enseignant = "SELECT id_enseignant
                                        FROM enseignant
@@ -60,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
+                // Meme principe pour l'espace etudiant : chaque etudiant voit ses donnees.
                 if ($role === 'etudiant') {
                     $sql_etudiant = "SELECT id_etudiant
                                      FROM etudiant

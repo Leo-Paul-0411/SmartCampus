@@ -1,4 +1,5 @@
 <?php
+// Header commun : prepare la session, le layout global et la navigation par role.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -35,6 +36,7 @@ $nom_complet = trim($prenom . ' ' . $nom);
 </head>
 <body class="<?php echo $role === '' ? 'guest-page' : 'app-page'; ?>">
     <div class="app-layout">
+        <!-- Sidebar : menu principal adapte au role connecte. -->
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <span class="brand-mark">SC</span>
@@ -54,6 +56,7 @@ $nom_complet = trim($prenom . ' ' . $nom);
             <?php } ?>
 
             <nav class="sidebar-nav">
+                <!-- Les liens affiches changent selon le role stocke en session. -->
                 <?php if ($role === '') { ?>
                     <a href="/SmartCampus/public/login.php"<?php echo lien_actif($page_courante, '/SmartCampus/public/login.php'); ?>>Connexion</a>
                 <?php } elseif ($role === 'admin') { ?>
@@ -79,6 +82,7 @@ $nom_complet = trim($prenom . ' ' . $nom);
         </aside>
 
         <div class="main-content">
+            <!-- Topbar : rappel du contexte utilisateur sur toutes les pages. -->
             <header class="topbar">
                 <div>
                     <p class="topbar-kicker">Plateforme de gestion academique</p>

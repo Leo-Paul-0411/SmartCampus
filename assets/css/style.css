@@ -1,5 +1,6 @@
 * { box-sizing: border-box; }
 
+/* Variables globales : couleurs, bordures et ombres communes. */
 :root {
     --bg: #f4f6f9;
     --panel: #ffffff;
@@ -27,12 +28,14 @@ body {
 a { color: var(--primary); }
 a:hover { color: var(--primary-dark); }
 
+/* Layout global de l'application : sidebar + contenu principal. */
 .app-layout {
     min-height: 100vh;
     display: grid;
     grid-template-columns: 240px 1fr;
 }
 
+/* Sidebar et topbar : navigation par role et contexte utilisateur. */
 .sidebar {
     position: sticky;
     top: 0;
@@ -123,6 +126,7 @@ a:hover { color: var(--primary-dark); }
 .topbar-kicker { margin: 0 0 2px; color: var(--muted); font-size: 13px; }
 .user-context { margin: 0; color: var(--muted); font-size: 14px; }
 
+/* Contenu principal et blocs de page. */
 main {
     width: 100%;
     max-width: 1220px;
@@ -163,6 +167,7 @@ h3 { font-size: 17px; }
     font-size: 14px;
 }
 
+/* Cartes statistiques et raccourcis des dashboards. */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -221,6 +226,7 @@ h3 { font-size: 17px; }
     color: var(--primary-dark);
 }
 
+/* Formulaires : champs lisibles et focus visible. */
 .form-card {
     padding: 20px;
     margin-bottom: 22px;
@@ -275,6 +281,7 @@ textarea:focus {
 
 .toolbar form { width: 100%; }
 
+/* Boutons communs et variantes d'action. */
 button,
 .button,
 .btn {
@@ -318,6 +325,7 @@ button[disabled] {
     cursor: not-allowed;
 }
 
+/* Tableaux : lisibilite, hover et scroll horizontal sur petits ecrans. */
 .table-card {
     padding: 0;
     overflow: hidden;
@@ -364,6 +372,7 @@ td:last-child {
     white-space: nowrap;
 }
 
+/* Alertes de retour utilisateur : succes, erreur, attention, information. */
 .success,
 .error,
 .info,
@@ -408,6 +417,7 @@ td:last-child {
     border-left-color: var(--primary);
 }
 
+/* Badges de statut : inscription, validation, disponibilite. */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -425,6 +435,7 @@ td:last-child {
 .badge-muted { color: #4b5563; background: #e5e7eb; }
 .badge-info { color: #1d4ed8; background: #dbeafe; }
 
+/* Etats vides et emploi du temps. */
 .empty-state {
     display: block;
     padding: 18px;
@@ -479,6 +490,7 @@ td:last-child {
     max-width: 460px;
 }
 
+/* Pied de page et bouton retour en haut. */
 footer {
     padding: 18px 32px;
     color: var(--muted);
@@ -496,6 +508,7 @@ footer {
     box-shadow: var(--shadow);
 }
 
+/* Responsive simple : la sidebar passe en navigation horizontale. */
 @media (max-width: 768px) {
     .app-layout,
     .guest-page .app-layout {

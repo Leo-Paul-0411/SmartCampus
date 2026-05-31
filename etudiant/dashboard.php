@@ -1,4 +1,5 @@
 <?php
+// Dashboard etudiant : resume les cours, demandes, notes et notifications personnelles.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -17,6 +18,7 @@ include __DIR__ . '/../includes/header.php';
     <p class="page-subtitle">Suivi rapide des cours, demandes d'inscription, notes et notifications.</p>
 
     <?php
+    // Tous les compteurs sont filtres avec l'id de l'etudiant connecte.
     $stmt_cours = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM inscription WHERE id_etudiant = ? AND statut = 'inscrit'");
     mysqli_stmt_bind_param($stmt_cours, "i", $id_etudiant);
     mysqli_stmt_execute($stmt_cours);

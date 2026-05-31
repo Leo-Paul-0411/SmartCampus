@@ -1,4 +1,5 @@
 <?php
+// Tableau de bord administrateur : resume l'etat global de la plateforme.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -14,6 +15,7 @@ include __DIR__ . '/../includes/header.php';
     <p class="page-subtitle">Vue rapide pour piloter la demo : effectifs, cours, inscriptions et demandes a traiter.</p>
 
     <?php
+    // Petite fonction locale pour recuperer les compteurs affiches en cartes.
     function compter($conn, $sql) {
         $resultat = mysqli_query($conn, $sql);
         if (!$resultat) { return 0; }
@@ -53,6 +55,7 @@ include __DIR__ . '/../includes/header.php';
     <section>
         <h2>Inscriptions recentes</h2>
         <?php
+        // Dernieres inscriptions utiles pour suivre l'activite recente.
         $sql = "
             SELECT inscription.date_inscription, inscription.statut, utilisateur.nom, utilisateur.prenom, cours.titre
             FROM inscription

@@ -1,4 +1,6 @@
 <?php
+// Gestion admin des etudiants.
+// Chaque etudiant est lie a un compte utilisateur pour la connexion.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -10,6 +12,7 @@ $message = "";
 $erreur = "";
 $etudiant_modif = null;
 
+// Suppression controlee : si l'etudiant a deja des donnees, on desactive le compte.
 if (isset($_GET['supprimer'])) {
     $id_etudiant = intval($_GET['supprimer']);
 
@@ -55,6 +58,7 @@ if (isset($_GET['supprimer'])) {
     }
 }
 
+// Ajout : creation du compte utilisateur puis de la fiche etudiant.
 if (isset($_POST['ajouter_etudiant'])) {
     $nom = trim($_POST['nom'] ?? '');
     $prenom = trim($_POST['prenom'] ?? '');
@@ -112,6 +116,7 @@ if (isset($_POST['ajouter_etudiant'])) {
     }
 }
 
+// Modification : mise a jour des informations utilisateur et etudiant.
 if (isset($_POST['modifier_etudiant'])) {
     $id_etudiant = intval($_POST['id_etudiant'] ?? 0);
     $nom = trim($_POST['nom'] ?? '');

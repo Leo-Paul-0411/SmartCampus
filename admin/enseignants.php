@@ -1,4 +1,6 @@
 <?php
+// Gestion admin des enseignants.
+// Chaque enseignant est lie a un compte utilisateur et peut etre associe a des cours.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -10,6 +12,7 @@ $message = "";
 $erreur = "";
 $enseignant_modif = null;
 
+// Suppression controlee : un enseignant avec des cours est desactive.
 if (isset($_GET['supprimer'])) {
     $id_enseignant = intval($_GET['supprimer']);
 
@@ -55,6 +58,7 @@ if (isset($_GET['supprimer'])) {
     }
 }
 
+// Ajout : creation du compte utilisateur puis de la fiche enseignant.
 if (isset($_POST['ajouter_enseignant'])) {
     $nom = trim($_POST['nom'] ?? '');
     $prenom = trim($_POST['prenom'] ?? '');
@@ -110,6 +114,7 @@ if (isset($_POST['ajouter_enseignant'])) {
     }
 }
 
+// Modification : mise a jour des informations utilisateur et enseignant.
 if (isset($_POST['modifier_enseignant'])) {
     $id_enseignant = intval($_POST['id_enseignant'] ?? 0);
     $nom = trim($_POST['nom'] ?? '');

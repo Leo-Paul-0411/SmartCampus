@@ -1,7 +1,9 @@
+-- Creation complete de la base SmartCampus pour une importation directe.
 DROP DATABASE IF EXISTS smartcampus;
 CREATE DATABASE smartcampus CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE smartcampus;
 
+-- Tables principales : utilisateurs, profils, cours, inscriptions, notes et notifications.
 CREATE TABLE utilisateur (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -142,6 +144,8 @@ INSERT INTO cours (
 ('NET201', 'Reseaux et securite', 'Introduction aux reseaux et a la securite.', 2, 'Jeudi', '13:00:00', '15:00:00', 'R301', 'Semestre 1', 3),
 ('TESTCAP', 'Cours capacite test', 'Cours utilise pour tester la capacite maximale.', 1, 'Vendredi', '10:00:00', '12:00:00', 'S999', 'Semestre 1', 1);
 
+-- Scenarios d'inscription pour la demo :
+-- double inscription, demande en attente, reactivation, conflit horaire et capacite.
 INSERT INTO inscription (id_etudiant, id_cours, statut, date_inscription) VALUES
 (1, 1, 'inscrit', '2026-05-01 09:00:00'),
 (2, 2, 'inscrit', '2026-05-01 09:10:00'),
@@ -151,6 +155,7 @@ INSERT INTO inscription (id_etudiant, id_cours, statut, date_inscription) VALUES
 (1, 4, 'inscrit', '2026-05-01 09:30:00'),
 (2, 5, 'inscrit', '2026-05-01 09:40:00');
 
+-- Notes de depart pour tester moyenne ponderee, validation et verrouillage.
 INSERT INTO note (
     note_controle,
     note_exam,
@@ -167,6 +172,7 @@ INSERT INTO note (
 (15.00, 14.00, 13.00, 14.20, 0, '2026-05-12 10:00:00', NULL, 1, 4),
 (10.00, 11.00, 12.00, 10.90, 0, '2026-05-12 11:00:00', NULL, 2, 5);
 
+-- Notifications simples visibles dans les espaces utilisateurs.
 INSERT INTO notification (message, type_notification, lue, date_creation, id_user) VALUES
 ('Bienvenue sur SmartCampus.', 'information', 0, '2026-05-01 08:00:00', 1),
 ('Votre inscription au cours Programmation PHP a ete validee.', 'inscription', 0, '2026-05-01 09:05:00', 5),

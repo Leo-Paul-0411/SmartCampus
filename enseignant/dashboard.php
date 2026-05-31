@@ -1,4 +1,5 @@
 <?php
+// Dashboard enseignant : indicateurs limites aux cours de l'enseignant connecte.
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -15,6 +16,7 @@ include __DIR__ . '/../includes/header.php';
     <h1>Dashboard enseignant</h1>
     <p class="page-subtitle">Acces rapide aux cours, aux etudiants inscrits et aux notes a finaliser.</p>
     <?php
+    // Les compteurs donnent une vue rapide avant d'aller vers les cours ou les notes.
     $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM cours WHERE id_enseignant = ?");
     mysqli_stmt_bind_param($stmt, "i", $id_enseignant);
     mysqli_stmt_execute($stmt);
