@@ -29,6 +29,50 @@ function etudiant_deja_inscrit($conn, $id_etudiant, $id_cours)
     return $ligne['total'] > 0;
 }
 
+// Recupere une inscription existante pour le couple etudiant / cours.
+function recuperer_inscription($conn, $id_etudiant, $id_cours)
+{
+    $sql = "SELECT id_inscription, statut
+            FROM inscription
+            WHERE id_etudiant = ?
+            AND id_cours = ?
+            LIMIT 1";
+
+    $requete = mysqli_prepare($conn, $sql);
+
+    if (!$requete) {
+        return false;
+    }
+
+    mysqli_stmt_bind_param($requete, "ii", $id_etudiant, $id_cours);
+    mysqli_stmt_execute($requete);
+    $resultat = mysqli_stmt_get_result($requete);
+    $inscription = mysqli_fetch_assoc($resultat);
+    mysqli_stmt_close($requete);
+
+    return $inscription;
+}
+
+// Reactive une inscription deja existante.
+function reactiver_inscription($conn, $id_inscription)
+{
+    $sql = "UPDATE inscription
+            SET statut = 'inscrit', date_inscription = NOW()
+            WHERE id_inscription = ?";
+
+    $requete = mysqli_prepare($conn, $sql);
+
+    if (!$requete) {
+        return false;
+    }
+
+    mysqli_stmt_bind_param($requete, "i", $id_inscription);
+    $succes = mysqli_stmt_execute($requete);
+    mysqli_stmt_close($requete);
+
+    return $succes;
+}
+
 // Verifie si le nombre d'inscrits atteint la capacite maximale du cours.
 function cours_est_complet($conn, $id_cours)
 {

@@ -9,7 +9,7 @@ if (function_exists('verifier_role')) {
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<main class="container">
+<section class="container">
     <h1>Dashboard administrateur</h1>
 
     <?php
@@ -65,7 +65,7 @@ include __DIR__ . '/../includes/header.php';
             </tbody>
         </table>
     </section>
-</main>
+</section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 

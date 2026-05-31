@@ -11,20 +11,39 @@ $type_message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_etudiant = (int) $_POST['id_etudiant'];
     $id_cours = (int) $_POST['id_cours'];
+    $inscription_existante = false;
 
     if ($id_etudiant <= 0 || $id_cours <= 0) {
         $message = "Erreur : veuillez choisir un etudiant et un cours.";
         $type_message = "erreur";
-    } elseif (etudiant_deja_inscrit($conn, $id_etudiant, $id_cours)) {
-        $message = "Erreur : cet etudiant est deja inscrit a ce cours.";
+    } else {
+        $inscription_existante = recuperer_inscription($conn, $id_etudiant, $id_cours);
+    }
+
+    if ($message === "" && $inscription_existante && $inscription_existante['statut'] === 'inscrit') {
+        $message = "Erreur : étudiant déjà inscrit.";
         $type_message = "erreur";
-    } elseif (cours_est_complet($conn, $id_cours)) {
+    } elseif ($message === "" && cours_est_complet($conn, $id_cours)) {
         $message = "Erreur : ce cours est complet.";
         $type_message = "erreur";
-    } elseif (conflit_horaire($conn, $id_etudiant, $id_cours)) {
+    } elseif ($message === "" && conflit_horaire($conn, $id_etudiant, $id_cours)) {
         $message = "Erreur : cet etudiant a deja un cours sur ce creneau.";
         $type_message = "erreur";
-    } else {
+    }
+
+    if ($message === "") {
+        $inscription_reussie = false;
+
+        if ($inscription_existante) {
+            if (reactiver_inscription($conn, $inscription_existante['id_inscription'])) {
+                $message = "Inscription reactivee avec succes.";
+                $type_message = "succes";
+                $inscription_reussie = true;
+            } else {
+                $message = "Erreur lors de la reactivation de l'inscription : " . mysqli_error($conn);
+                $type_message = "erreur";
+            }
+        } else {
         $statut = "inscrit";
         $sql_insert = "INSERT INTO inscription (id_etudiant, id_cours, statut)
                        VALUES (?, ?, ?)";
@@ -36,29 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (mysqli_stmt_execute($requete_insert)) {
                 $message = "Inscription ajoutee avec succes.";
                 $type_message = "succes";
-
-                // Recuperation du compte utilisateur de l'etudiant pour creer la notification.
-                $sql_etudiant = "SELECT id_user
-                                 FROM etudiant
-                                 WHERE id_etudiant = ?";
-                $requete_etudiant = mysqli_prepare($conn, $sql_etudiant);
-
-                if ($requete_etudiant) {
-                    mysqli_stmt_bind_param($requete_etudiant, "i", $id_etudiant);
-                    mysqli_stmt_execute($requete_etudiant);
-                    $result_etudiant = mysqli_stmt_get_result($requete_etudiant);
-                    $etudiant = mysqli_fetch_assoc($result_etudiant);
-                    mysqli_stmt_close($requete_etudiant);
-
-                    if ($etudiant) {
-                        creer_notification(
-                            $conn,
-                            $etudiant['id_user'],
-                            "Vous avez ete inscrit a un cours.",
-                            "inscription"
-                        );
-                    }
-                }
+                $inscription_reussie = true;
             } else {
                 $message = "Erreur lors de l'inscription : " . mysqli_error($conn);
                 $type_message = "erreur";
@@ -68,6 +65,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $message = "Erreur de preparation de la requete : " . mysqli_error($conn);
             $type_message = "erreur";
+        }
+        }
+
+        if ($inscription_reussie) {
+            // Recuperation du compte utilisateur de l'etudiant pour creer la notification.
+            $sql_etudiant = "SELECT id_user
+                             FROM etudiant
+                             WHERE id_etudiant = ?";
+            $requete_etudiant = mysqli_prepare($conn, $sql_etudiant);
+
+            if ($requete_etudiant) {
+                mysqli_stmt_bind_param($requete_etudiant, "i", $id_etudiant);
+                mysqli_stmt_execute($requete_etudiant);
+                $result_etudiant = mysqli_stmt_get_result($requete_etudiant);
+                $etudiant = mysqli_fetch_assoc($result_etudiant);
+                mysqli_stmt_close($requete_etudiant);
+
+                if ($etudiant) {
+                    creer_notification(
+                        $conn,
+                        $etudiant['id_user'],
+                        "Vous avez ete inscrit a un cours.",
+                        "inscription"
+                    );
+                }
+            }
         }
     }
 }

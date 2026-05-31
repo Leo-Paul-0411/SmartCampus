@@ -21,7 +21,7 @@ if (isset($_POST['ajouter_cours'])) {
 }
 include __DIR__ . '/../includes/header.php';
 ?>
-<main class="container">
+<section class="container">
 <h1>Gestion des cours</h1>
 <?php if ($message): ?><p class="success"><?php echo htmlspecialchars($message); ?></p><?php endif; ?>
 <?php if ($erreur): ?><p class="error"><?php echo htmlspecialchars($erreur); ?></p><?php endif; ?>
@@ -29,5 +29,5 @@ include __DIR__ . '/../includes/header.php';
 <section class="toolbar"><form method="get" action="cours.php"><input type="text" name="recherche" placeholder="Rechercher par code ou titre" value="<?php echo isset($_GET['recherche']) ? htmlspecialchars($_GET['recherche']) : ''; ?>"><button type="submit">Rechercher</button><a class="button secondary" href="cours.php">Réinitialiser</a></form></section>
 <?php $resultat = mysqli_query($conn, "SELECT cours.*, enseignant.numero_enseignant FROM cours LEFT JOIN enseignant ON cours.id_enseignant = enseignant.id_enseignant ORDER BY cours.code_cours"); ?>
 <table><thead><tr><th>Code</th><th>Titre</th><th>Jour</th><th>Début</th><th>Fin</th><th>Salle</th><th>Semestre</th><th>Capacité</th><th>Enseignant</th><th>Action</th></tr></thead><tbody><?php if ($resultat && mysqli_num_rows($resultat) > 0): while ($cours = mysqli_fetch_assoc($resultat)): ?><tr><td><?php echo htmlspecialchars($cours['code_cours']); ?></td><td><?php echo htmlspecialchars($cours['titre']); ?></td><td><?php echo htmlspecialchars($cours['jour']); ?></td><td><?php echo htmlspecialchars($cours['heure_debut']); ?></td><td><?php echo htmlspecialchars($cours['heure_fin']); ?></td><td><?php echo htmlspecialchars($cours['salle']); ?></td><td><?php echo htmlspecialchars($cours['semestre']); ?></td><td><?php echo htmlspecialchars($cours['capacite_max']); ?></td><td><?php echo htmlspecialchars($cours['numero_enseignant'] ?? 'Non défini'); ?></td><td><a class="button danger" href="cours.php?supprimer=<?php echo $cours['id_cours']; ?>" onclick="return confirm('Supprimer ce cours ?');">Supprimer</a></td></tr><?php endwhile; else: ?><tr><td colspan="10">Aucun cours trouvé.</td></tr><?php endif; ?></tbody></table>
-</main>
+</section>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

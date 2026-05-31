@@ -9,7 +9,7 @@ if (function_exists('verifier_role')) {
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<main class="container">
+<section class="container">
     <h1>Gestion des étudiants</h1>
     <section class="toolbar"><input type="text" placeholder="Rechercher un étudiant"><button type="button">Ajouter un étudiant</button></section>
     <?php
@@ -26,6 +26,6 @@ include __DIR__ . '/../includes/header.php';
             <?php else: ?><tr><td colspan="7">Aucun étudiant trouvé.</td></tr><?php endif; ?>
         </tbody>
     </table>
-</main>
+</section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

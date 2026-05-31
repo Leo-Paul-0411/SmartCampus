@@ -12,7 +12,7 @@ $id_enseignant = $_SESSION['id_enseignant'] ?? 1;
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<main class="container">
+<section class="container">
     <h1>Dashboard enseignant</h1>
     <?php
     $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM cours WHERE id_enseignant = ?");
@@ -20,6 +20,6 @@ include __DIR__ . '/../includes/header.php';
     ?>
     <section class="stats-grid"><article class="stat-card"><h2>Mes cours</h2><p><?php echo $total_cours; ?></p></article></section>
     <section class="menu-cards"><a class="card-link" href="mes_cours.php">Consulter mes cours</a><a class="card-link" href="notes.php">Saisie des notes</a></section>
-</main>
+</section>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
